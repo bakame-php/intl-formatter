@@ -1,0 +1,74 @@
+{
+    "name": "bakame/laravel-intl-formatter",
+    "type": "library",
+    "description": "Global helpers for internalization in Laravel application",
+    "keywords": ["blade", "intl", "laravel", "date", "number", "formatter", "internalization"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name" : "Ignace Nyamagana Butera",
+            "email" : "nyamsprod@gmail.com",
+            "homepage" : "https://github.com/nyamsprod/",
+            "role" : "Developer"
+        }
+    ],
+    "support": {
+        "docs": "https://github.com/bakame-php/laravel-intl-formatter",
+        "issues": "https://github.com/bakame-php/laravel-intl-formatter/issues",
+        "source": "https://github.com/bakame-php/laravel-intl-formatter"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/nyamsprod"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Bakame\\Laravel\\Intl\\": "src/"
+        },
+        "exclude-from-classmap": [
+            "src/**Test.php",
+            "src/Test**"
+        ]
+    },
+    "require": {
+        "ext-json": "*",
+        "php": "^7.4 || ^8.0",
+        "symfony/intl": "^5.0||^6.0",
+        "ext-intl": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.8",
+        "phpstan/phpstan": "^1.7",
+        "phpstan/phpstan-deprecation-rules": "^1.0",
+        "phpstan/phpstan-phpunit": "^1.1",
+        "phpstan/phpstan-strict-rules": "^1.2",
+        "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "phpcs:fix" : "php-cs-fixer fix -vvv --using-cache=no --allow-risky=yes --ansi",
+        "phpcs": "php-cs-fixer fix -vvv --diff --dry-run --allow-risky=yes --ansi",
+        "phpstan": "phpstan analyse -c phpstan.neon --ansi --memory-limit 192M",
+        "phpunit": "XDEBUG_MODE=coverage phpunit --coverage-text",
+        "test": [
+            "@phpunit",
+            "@phpstan",
+            "@phpcs"
+        ]
+    },
+    "scripts-descriptions": {
+        "phpcs": "Runs coding style test suite",
+        "phpstan": "Runs complete codebase static analysis",
+        "phpunit": "Runs unit and function tests",
+        "test": "Runs all tests"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
