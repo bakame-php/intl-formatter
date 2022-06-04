@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Laravel\Intl\Options;
+namespace Bakame\Intl\Options;
 
-use Bakame\Laravel\Intl\FailedFormatting;
+use Bakame\Intl\FailedFormatting;
 use IntlDateFormatter;
 use PHPUnit\Framework\TestCase;
 

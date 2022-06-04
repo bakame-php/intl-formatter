@@ -25,7 +25,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Bakame\\Laravel\\Intl\\": "src/"
+            "Bakame\\Intl\\": "src/"
         },
         "exclude-from-classmap": [
             "src/**Test.php",

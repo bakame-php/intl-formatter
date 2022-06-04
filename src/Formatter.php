@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Laravel\Intl;
+namespace Bakame\Intl;
 
-use Bakame\Laravel\Intl\Options\DateType;
-use Bakame\Laravel\Intl\Options\NumberAttribute;
-use Bakame\Laravel\Intl\Options\NumberStyle;
-use Bakame\Laravel\Intl\Options\NumberType;
-use Bakame\Laravel\Intl\Options\TimeType;
+use Bakame\Intl\Options\DateType;
+use Bakame\Intl\Options\NumberAttribute;
+use Bakame\Intl\Options\NumberStyle;
+use Bakame\Intl\Options\NumberType;
+use Bakame\Intl\Options\TimeType;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;

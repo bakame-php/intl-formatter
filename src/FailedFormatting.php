@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Laravel\Intl;
+namespace Bakame\Intl;
 
 use RuntimeException;
 use Throwable;

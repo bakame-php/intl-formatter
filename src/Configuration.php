@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Laravel\Intl;
+namespace Bakame\Intl;
 
-use Bakame\Laravel\Intl\Options\DateType;
-use Bakame\Laravel\Intl\Options\NumberStyle;
-use Bakame\Laravel\Intl\Options\TimeType;
+use Bakame\Intl\Options\DateType;
+use Bakame\Intl\Options\NumberStyle;
+use Bakame\Intl\Options\TimeType;
 
 final class Configuration
 {

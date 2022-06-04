@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bakame\Laravel\Intl\Options;
+namespace Bakame\Intl\Options;
 
 use NumberFormatter;
 
