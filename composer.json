@@ -1,8 +1,8 @@
 {
-    "name": "bakame/laravel-intl-formatter",
+    "name": "bakame/intl-formatter",
     "type": "library",
-    "description": "Global helpers for internalization in Laravel application",
-    "keywords": ["blade", "intl", "laravel", "date", "number", "formatter", "internalization"],
+    "description": "Classes to help internalization in your PHP application",
+    "keywords": ["intl", "date", "number", "formatter", "internalization"],
     "license": "MIT",
     "authors": [
         {
@@ -13,9 +13,9 @@
         }
     ],
     "support": {
-        "docs": "https://github.com/bakame-php/laravel-intl-formatter",
-        "issues": "https://github.com/bakame-php/laravel-intl-formatter/issues",
-        "source": "https://github.com/bakame-php/laravel-intl-formatter"
+        "docs": "https://github.com/bakame-php/intl-formatter",
+        "issues": "https://github.com/bakame-php/intl-formatter/issues",
+        "source": "https://github.com/bakame-php/intl-formatter"
     },
     "funding": [
         {
