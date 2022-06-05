@@ -66,7 +66,7 @@ Credits
 Attribution
 -------
 
-The package `Formatter` class and the exposed functions are heavily inspired by previous works done by [Fabien Potencier](https://github.com/fabpot) on [Twig Intl Extension](https://github.com/twigphp/intl-extra).
+The package `Formatter` class and its API are heavily inspired by previous works done by [Fabien Potencier](https://github.com/fabpot) on [Twig Intl Extension](https://github.com/twigphp/intl-extra).
 
 License
 -------
