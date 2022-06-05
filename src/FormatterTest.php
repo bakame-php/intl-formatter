@@ -7,8 +7,6 @@ namespace Bakame\Intl;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
-use IntlDateFormatter;
-use NumberFormatter;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,11 +23,11 @@ final class FormatterTest extends TestCase
         $this->formatter = new Formatter(
             Configuration::fromApplication([
                 'date' => [
-                    'dateType' => IntlDateFormatter::FULL,
-                    'timeType' => IntlDateFormatter::FULL,
+                    'dateFormat' => 'full',
+                    'timeFormat' => 'full',
                 ],
                 'number' => [
-                    'style' => NumberFormatter::DECIMAL,
+                    'style' => 'decimal',
                 ],
             ]),
             SystemDateResolver::fromSystem()
@@ -41,14 +39,14 @@ final class FormatterTest extends TestCase
     {
         $configuration = Configuration::fromApplication([
             'date' => [
-                'dateType' => IntlDateFormatter::FULL,
-                'timeType' => IntlDateFormatter::FULL,
+                'dateFormat' => 'full',
+                'timeFormat' => 'full',
             ],
             'number' => [
-                'style' => NumberFormatter::DECIMAL,
-                'attributes' => [NumberFormatter::FRACTION_DIGITS => 1],
-                'textAttributes' => [NumberFormatter::POSITIVE_PREFIX => '++'],
-                'symbolAttributes' => [NumberFormatter::DECIMAL_SEPARATOR_SYMBOL => 'x'],
+                'style' => 'decimal',
+                'attributes' => ['fraction_digit' => 1],
+                'textAttributes' => ['positive_prefix' => '++'],
+                'symbolAttributes' => ['decimal_separator' => 'x'],
             ],
         ]);
 

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Bakame\Intl;
 
 use Bakame\Intl\Options\DateType;
+use Bakame\Intl\Options\NumberAttribute;
 use Bakame\Intl\Options\NumberStyle;
+use Bakame\Intl\Options\SymbolAttribute;
+use Bakame\Intl\Options\TextAttribute;
 use Bakame\Intl\Options\TimeType;
 
 final class Configuration
@@ -22,24 +25,24 @@ final class Configuration
     public ?string $numberPattern;
     /**
      * @readonly
-     * @var array<int, int|float>
+     * @var array<NumberAttribute>
      */
     public array $attributes;
     /**
      * @readonly
-     * @var array<int, string>
+     * @var array<TextAttribute>
      */
     public array $textAttributes;
     /**
      * @readonly
-     * @var array<int, string>
+     * @var array<SymbolAttribute>
      */
     public array $symbolAttributes;
 
     /**
-     * @param array<int, int|float> $attributes
-     * @param array<int, string> $textAttributes
-     * @param array<int, string> $symbolAttributes
+     * @param array<NumberAttribute> $attributes
+     * @param array<TextAttribute> $textAttributes
+     * @param array<SymbolAttribute> $symbolAttributes
      */
     public function __construct(
         DateType    $dateType,
@@ -64,16 +67,16 @@ final class Configuration
     /**
      * @param array{
      *     date:array{
-     *         dateType:int,
-     *         timeType:int,
+     *         dateFormat:string,
+     *         timeFormat:string,
      *         pattern?:?string
      *     },
      *     number:array{
-     *         style:int,
+     *         style:string,
      *         pattern?:?string,
-     *         attributes?:array<int, int|float>,
-     *         textAttributes?:array<int,string>,
-     *         symbolAttributes?:array<int,string>
+     *         attributes?:array<string, int|float|string>,
+     *         textAttributes?:array<string,string>,
+     *         symbolAttributes?:array<string,string>
      *     }
      * } $settings
      */
@@ -100,14 +103,59 @@ final class Configuration
         }
 
         return new self(
-            DateType::from($settings['date']['dateType']),
-            TimeType::from($settings['date']['timeType']),
-            NumberStyle::from($settings['number']['style']),
+            DateType::fromName($settings['date']['dateFormat']),
+            TimeType::fromName($settings['date']['timeFormat']),
+            NumberStyle::fromName($settings['number']['style']),
             $settings['date']['pattern'],
             $settings['number']['pattern'],
-            $settings['number']['attributes'],
-            $settings['number']['textAttributes'],
-            $settings['number']['symbolAttributes'],
+            self::filterNumberAttributes($settings['number']['attributes']),
+            self::filterTextAttributes($settings['number']['textAttributes']),
+            self::filterSymboAttributes($settings['number']['symbolAttributes']),
         );
+    }
+
+    /**
+     * @param array<string,int|float|string> $attributes
+     *
+     * @return array<NumberAttribute>
+     */
+    private static function filterNumberAttributes(array $attributes): array
+    {
+        $res = [];
+        foreach ($attributes as $name => $value) {
+            $res[] = NumberAttribute::from($name, $value);
+        }
+
+        return $res;
+    }
+
+    /**
+     * @param array<string,string> $attributes
+     *
+     * @return array<TextAttribute>
+     */
+    private static function filterTextAttributes(array $attributes): array
+    {
+        $res = [];
+        foreach ($attributes as $name => $value) {
+            $res[] = TextAttribute::from($name, $value);
+        }
+
+        return $res;
+    }
+
+    /**
+     * @param array<string,string> $attributes
+     *
+     * @return array<SymbolAttribute>
+     */
+    private static function filterSymboAttributes(array $attributes): array
+    {
+        $res = [];
+        foreach ($attributes as $name => $value) {
+            $res[] = SymbolAttribute::from($name, $value);
+        }
+
+        return $res;
     }
 }

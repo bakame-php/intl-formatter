@@ -283,16 +283,16 @@ final class Formatter
 
     private function addDefaultAttributes(NumberFormatter $numberFormatter): void
     {
-        foreach ($this->configuration->attributes as $attribute => $value) {
-            $numberFormatter->setAttribute($attribute, $value);
+        foreach ($this->configuration->attributes as $attribute) {
+            $attribute->addTo($numberFormatter);
         }
 
-        foreach ($this->configuration->textAttributes as $attribute => $value) {
-            $numberFormatter->setTextAttribute($attribute, $value);
+        foreach ($this->configuration->textAttributes as $textAttribute) {
+            $textAttribute->addTo($numberFormatter);
         }
 
-        foreach ($this->configuration->symbolAttributes as $attribute => $value) {
-            $numberFormatter->setSymbol($attribute, $value);
+        foreach ($this->configuration->symbolAttributes as $symbolAttribute) {
+            $symbolAttribute->addTo($numberFormatter);
         }
 
         if (null !== $this->configuration->numberPattern) {

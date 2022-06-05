@@ -1,4 +1,4 @@
-Laravel Intl Formatter
+Intl Formatter
 =======================================
 
 [![Author](http://img.shields.io/badge/author-@nyamsprod-blue.svg?style=flat-square)](https://twitter.com/nyamsprod)
@@ -8,8 +8,8 @@ Laravel Intl Formatter
 [![Total Downloads](https://img.shields.io/packagist/dt/bakame/intl-formatter.svg?style=flat-square)](https://packagist.org/packages/bakame/intl-formatter)
 [![Sponsor development of this project](https://img.shields.io/badge/sponsor%20this%20package-%E2%9D%A4-ff69b4.svg?style=flat-square)](https://github.com/sponsors/nyamsprod)
 
-The package can be used in any Laravel based application to quickly handle internationalization 
-by providing helper functions in Blade templates or Laravel codebase.
+The package can be used in any PHP application to quickly handle internationalization 
+by providing classes to format locale, language, timezones, currency and dates.
 
 System Requirements
 -------
