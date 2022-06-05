@@ -70,7 +70,7 @@ final class SystemDateResolver implements DateResolver
     /**
      * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
      */
-    public function determineTheTimezone($timezone): ?DateTimeZone
+    private function determineTheTimezone($timezone): ?DateTimeZone
     {
         if (null === $timezone) {
             return $this->timezone;
