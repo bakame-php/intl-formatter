@@ -4,28 +4,18 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
-use Bakame\Intl\Options\Calendar;
-use Bakame\Intl\Options\DateType;
 use Bakame\Intl\Options\NumberAttribute;
 use Bakame\Intl\Options\NumberStyle;
 use Bakame\Intl\Options\SymbolAttribute;
 use Bakame\Intl\Options\TextAttribute;
-use Bakame\Intl\Options\TimeType;
+use NumberFormatter;
 
-final class Configuration
+final class NumberFactory
 {
     /** @readonly */
-    public DateType $dateType;
-    /** @readonly */
-    public TimeType $timeType;
-    /** @readonly */
     public NumberStyle $style;
-    /* @readonly */
-    public Calendar $calendar;
     /** @readonly */
-    public ?string $datePattern;
-    /** @readonly */
-    public ?string $numberPattern;
+    public ?string $pattern;
     /**
      * @readonly
      * @var array<NumberAttribute>
@@ -48,22 +38,14 @@ final class Configuration
      * @param array<SymbolAttribute> $symbolAttributes
      */
     public function __construct(
-        DateType    $dateType,
-        TimeType    $timeType,
         NumberStyle $style,
-        ?Calendar    $calendar,
-        ?string     $datePattern = null,
-        ?string     $numberPattern = null,
+        ?string     $pattern = null,
         array       $attributes = [],
         array       $textAttributes = [],
         array       $symbolAttributes = []
     ) {
-        $this->dateType = $dateType;
-        $this->timeType = $timeType;
-        $this->calendar = $calendar ?? Calendar::fromName('gregorian');
-        $this->datePattern = $datePattern;
         $this->style = $style;
-        $this->numberPattern = $numberPattern;
+        $this->pattern = $pattern;
         $this->attributes = $attributes;
         $this->textAttributes = $textAttributes;
         $this->symbolAttributes = $symbolAttributes;
@@ -71,57 +53,37 @@ final class Configuration
 
     /**
      * @param array{
-     *     date:array{
-     *         dateFormat:string,
-     *         timeFormat:string,
-     *         pattern?:?string,
-     *         calendar?:string,
-     *     },
-     *     number:array{
      *         style:string,
      *         pattern?:?string,
      *         attributes?:array<string, int|float|string>,
      *         textAttributes?:array<string,string>,
      *         symbolAttributes?:array<string,string>
-     *     }
      * } $settings
      */
-    public static function fromApplication(array $settings): self
+    public static function fromAssociative(array $settings): self
     {
-        if (!array_key_exists('calendar', $settings['date'])) {
-            $settings['date']['calendar'] = 'gregorian';
+        if (!array_key_exists('pattern', $settings)) {
+            $settings['pattern'] = null;
         }
 
-        if (!array_key_exists('pattern', $settings['date'])) {
-            $settings['date']['pattern'] = null;
+        if (!array_key_exists('attributes', $settings)) {
+            $settings['attributes'] = [];
         }
 
-        if (!array_key_exists('pattern', $settings['number'])) {
-            $settings['number']['pattern'] = null;
+        if (!array_key_exists('textAttributes', $settings)) {
+            $settings['textAttributes'] = [];
         }
 
-        if (!array_key_exists('attributes', $settings['number'])) {
-            $settings['number']['attributes'] = [];
-        }
-
-        if (!array_key_exists('textAttributes', $settings['number'])) {
-            $settings['number']['textAttributes'] = [];
-        }
-
-        if (!array_key_exists('symbolAttributes', $settings['number'])) {
-            $settings['number']['symbolAttributes'] = [];
+        if (!array_key_exists('symbolAttributes', $settings)) {
+            $settings['symbolAttributes'] = [];
         }
 
         return new self(
-            DateType::fromName($settings['date']['dateFormat']),
-            TimeType::fromName($settings['date']['timeFormat']),
-            NumberStyle::fromName($settings['number']['style']),
-            Calendar::fromName($settings['date']['calendar']),
-            $settings['date']['pattern'],
-            $settings['number']['pattern'],
-            self::filterNumberAttributes($settings['number']['attributes']),
-            self::filterTextAttributes($settings['number']['textAttributes']),
-            self::filterSymboAttributes($settings['number']['symbolAttributes']),
+            NumberStyle::fromName($settings['style']),
+            $settings['pattern'],
+            self::filterNumberAttributes($settings['attributes']),
+            self::filterTextAttributes($settings['textAttributes']),
+            self::filterSymboAttributes($settings['symbolAttributes']),
         );
     }
 
@@ -168,5 +130,46 @@ final class Configuration
         }
 
         return $res;
+    }
+
+    /**
+     * Returns a new NumberFormatter.
+     *
+     * @param array<string, int|float|string> $extraAttributes
+     */
+    public function newNumberFormatter(string $locale, NumberStyle $style, array $extraAttributes): NumberFormatter
+    {
+        $instance = new NumberFormatter($locale, $style->value);
+        $this->addAttributes($instance, $extraAttributes);
+
+        return $instance;
+    }
+
+    /**
+     * Add attributes to a NumberFormatter instance.
+     *
+     * @param array<string, int|float|string> $attributes
+     */
+    public function addAttributes(NumberFormatter $numberFormatter, array $attributes = []): void
+    {
+        foreach ($this->attributes as $attribute) {
+            $attribute->addTo($numberFormatter);
+        }
+
+        foreach (self::filterNumberAttributes($attributes) as $attribute) {
+            $attribute->addTo($numberFormatter);
+        }
+
+        foreach ($this->textAttributes as $textAttribute) {
+            $textAttribute->addTo($numberFormatter);
+        }
+
+        foreach ($this->symbolAttributes as $symbolAttribute) {
+            $symbolAttribute->addTo($numberFormatter);
+        }
+
+        if (null !== $this->pattern) {
+            $numberFormatter->setPattern($this->pattern);
+        }
     }
 }

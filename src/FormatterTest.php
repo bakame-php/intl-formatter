@@ -21,38 +21,31 @@ final class FormatterTest extends TestCase
         parent::setUp();
 
         $this->formatter = new Formatter(
-            Configuration::fromApplication([
-                'date' => [
-                    'dateFormat' => 'full',
-                    'timeFormat' => 'full',
-                ],
-                'number' => [
-                    'style' => 'decimal',
-                ],
-            ]),
-            SystemDateResolver::fromSystem()
+            DateFactory::fromAssociative(['dateFormat' => 'full', 'timeFormat' => 'full', 'calendar' => 'gregorian']),
+            NumberFactory::fromAssociative(['style' => 'decimal']),
+            DateResolver::fromSystem()
         );
     }
 
     /** @test */
     public function it_can_be_instantiated_with_a_different_configuration(): void
     {
-        $configuration = Configuration::fromApplication([
-            'date' => [
-                'dateFormat' => 'full',
-                'timeFormat' => 'full',
-            ],
-            'number' => [
-                'style' => 'decimal',
-                'attributes' => ['fraction_digit' => 1],
-                'textAttributes' => ['positive_prefix' => '++'],
-                'symbolAttributes' => ['decimal_separator' => 'x'],
-            ],
+        $dateFactory = DateFactory::fromAssociative([
+            'dateFormat' => 'full',
+            'timeFormat' => 'full',
+            'calendar' => 'gregorian',
         ]);
 
-        $formatter = new Formatter($configuration, SystemDateResolver::fromSystem());
+        $numberFactory = NumberFactory::fromAssociative([
+            'style' => 'decimal',
+            'attributes' => ['fraction_digit' => 1],
+            'textAttributes' => ['positive_prefix' => '++'],
+            'symbolAttributes' => ['decimal_separator' => 'x'],
+        ]);
 
-        self::assertSame('++12x3', $formatter->formatNumber(12.3456, ['padding_position' => 'after_prefix'], 'decimal', 'default', 'fr'));
+        $formatter = new Formatter($dateFactory, $numberFactory, DateResolver::fromSystem());
+
+        self::assertSame('++12x3', $formatter->formatNumber(12.3456, 'fr', 'default', ['padding_position' => 'after_prefix'], 'decimal'));
     }
 
     /** @test */
@@ -62,19 +55,19 @@ final class FormatterTest extends TestCase
         $dateImmutable = new DateTimeImmutable('2019-08-07 23:39:12');
         $date = new DateTime('2019-08-07 23:39:12');
 
-        self::assertSame('Jun 3, 2022', $this->formatter->formatDate(1654247542, 'medium'));
-        self::assertSame('Jun 3, 2022', $this->formatter->formatDate('1654247542', 'medium'));
+        self::assertSame('Jun 3, 2022', $this->formatter->formatDate(1654247542, null, null, 'medium'));
+        self::assertSame('Jun 3, 2022', $this->formatter->formatDate('1654247542', null, null, 'medium'));
         self::assertSame($this->formatter->formatDate(null), $this->formatter->formatDate('NoW'));
         self::assertSame($this->formatter->formatDate($date), $this->formatter->formatDate($dateImmutable));
         self::assertSame($this->formatter->formatDate($date), $this->formatter->formatDate($dateString));
         self::assertSame(
-            $this->formatter->formatDate($dateString, 'full', null, 'Africa/Kinshasa'),
-            $this->formatter->formatDate($dateString, 'full', null, new DateTimeZone('Africa/Kinshasa'))
+            $this->formatter->formatDate($dateString, null, 'Africa/Kinshasa', 'full', null),
+            $this->formatter->formatDate($dateString, null, new DateTimeZone('Africa/Kinshasa'), 'full', null)
         );
 
         self::assertNotSame(
-            $this->formatter->formatDateTime($dateString, 'full', 'full', null, 'Africa/Kinshasa'),
-            $this->formatter->formatDateTime($dateString, 'full', 'full', null, false)
+            $this->formatter->formatDateTime($dateString, null, 'Africa/Kinshasa', 'full', 'full', null),
+            $this->formatter->formatDateTime($dateString, null, false, 'full', 'full', null)
         );
     }
 
@@ -91,7 +84,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatDate('2019-08-07 23:39:12', 'foobar');
+        $this->formatter->formatDate('2019-08-07 23:39:12', null, null, 'foobar');
     }
 
     /** @test */
@@ -99,7 +92,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatTime('2019-08-07 23:39:12', 'foobar');
+        $this->formatter->formatTime('2019-08-07 23:39:12', null, null, 'foobar');
     }
 
     /** @test */
@@ -107,7 +100,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, [], 'foobar');
+        $this->formatter->formatNumber(42, null, 'default', [], 'foobar');
     }
 
     /** @test */
@@ -115,7 +108,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, [], 'decimal', 'foobar');
+        $this->formatter->formatNumber(42, null, 'foobar', [], 'decimal');
     }
 
     /** @test */
@@ -123,7 +116,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, ['foobar' => 1]);
+        $this->formatter->formatNumber(42, null, 'default', ['foobar' => 1]);
     }
 
     /** @test */
@@ -131,7 +124,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, ['rounding_mode' => 'foobar']);
+        $this->formatter->formatNumber(42, null, 'default', ['rounding_mode' => 'foobar']);
     }
 
     /** @test */
@@ -139,7 +132,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, ['padding_position' => 'foobar']);
+        $this->formatter->formatNumber(42, null, 'default', ['padding_position' => 'foobar']);
     }
 
     /** @test */
@@ -147,7 +140,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, ['grouping_used' => 'foobar']);
+        $this->formatter->formatNumber(42, null, 'default', ['grouping_used' => 'foobar']);
     }
 
     /**
