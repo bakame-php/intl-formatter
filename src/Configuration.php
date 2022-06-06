@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
+use Bakame\Intl\Options\Calendar;
 use Bakame\Intl\Options\DateType;
 use Bakame\Intl\Options\NumberAttribute;
 use Bakame\Intl\Options\NumberStyle;
@@ -19,6 +20,8 @@ final class Configuration
     public TimeType $timeType;
     /** @readonly */
     public NumberStyle $style;
+    /* @readonly */
+    public Calendar $calendar;
     /** @readonly */
     public ?string $datePattern;
     /** @readonly */
@@ -48,6 +51,7 @@ final class Configuration
         DateType    $dateType,
         TimeType    $timeType,
         NumberStyle $style,
+        ?Calendar    $calendar,
         ?string     $datePattern = null,
         ?string     $numberPattern = null,
         array       $attributes = [],
@@ -56,6 +60,7 @@ final class Configuration
     ) {
         $this->dateType = $dateType;
         $this->timeType = $timeType;
+        $this->calendar = $calendar ?? Calendar::fromName('gregorian');
         $this->datePattern = $datePattern;
         $this->style = $style;
         $this->numberPattern = $numberPattern;
@@ -69,7 +74,8 @@ final class Configuration
      *     date:array{
      *         dateFormat:string,
      *         timeFormat:string,
-     *         pattern?:?string
+     *         pattern?:?string,
+     *         calendar?:string,
      *     },
      *     number:array{
      *         style:string,
@@ -82,6 +88,10 @@ final class Configuration
      */
     public static function fromApplication(array $settings): self
     {
+        if (!array_key_exists('calendar', $settings['date'])) {
+            $settings['date']['calendar'] = 'gregorian';
+        }
+
         if (!array_key_exists('pattern', $settings['date'])) {
             $settings['date']['pattern'] = null;
         }
@@ -106,6 +116,7 @@ final class Configuration
             DateType::fromName($settings['date']['dateFormat']),
             TimeType::fromName($settings['date']['timeFormat']),
             NumberStyle::fromName($settings['number']['style']),
+            Calendar::fromName($settings['date']['calendar']),
             $settings['date']['pattern'],
             $settings['number']['pattern'],
             self::filterNumberAttributes($settings['number']['attributes']),

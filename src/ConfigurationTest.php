@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
+use Bakame\Intl\Options\Calendar;
 use Bakame\Intl\Options\DateType;
 use Bakame\Intl\Options\NumberAttribute;
 use Bakame\Intl\Options\NumberStyle;
@@ -21,6 +22,7 @@ final class ConfigurationTest extends TestCase
             DateType::fromName('full'),
             TimeType::fromName('short'),
             NumberStyle::fromName('currency'),
+            Calendar::fromName('gregorian'),
             null,
             '',
             [NumberAttribute::from('grouping_used', 2)],
@@ -33,6 +35,7 @@ final class ConfigurationTest extends TestCase
         self::assertCount(0, $config->symbolAttributes);
         self::assertNull($config->datePattern);
         self::assertEmpty($config->numberPattern);
+        self::assertSame(IntlDateFormatter::GREGORIAN, $config->calendar->value);
         self::assertSame(IntlDateFormatter::FULL, $config->dateType->value);
         self::assertSame(IntlDateFormatter::SHORT, $config->timeType->value);
         self::assertSame(NumberFormatter::CURRENCY, $config->style->value);
@@ -56,6 +59,7 @@ final class ConfigurationTest extends TestCase
         self::assertCount(0, $config->symbolAttributes);
         self::assertNull($config->datePattern);
         self::assertNull($config->numberPattern);
+        self::assertSame(IntlDateFormatter::GREGORIAN, $config->calendar->value);
         self::assertSame(IntlDateFormatter::FULL, $config->dateType->value);
         self::assertSame(IntlDateFormatter::SHORT, $config->timeType->value);
         self::assertSame(NumberFormatter::CURRENCY, $config->style->value);

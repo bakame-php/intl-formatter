@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
+use Bakame\Intl\Options\Calendar;
 use Bakame\Intl\Options\DateType;
 use Bakame\Intl\Options\NumberAttribute;
 use Bakame\Intl\Options\NumberStyle;
@@ -177,7 +178,7 @@ final class Formatter
         ?string $timeFormat = null,
         ?string $pattern = null,
         $timezone = null,
-        string $calendar = 'gregorian',
+        ?string $calendar = null,
         string $locale = null
     ): string {
         try {
@@ -205,7 +206,7 @@ final class Formatter
         ?string $dateFormat = null,
         ?string $pattern = null,
         $timezone = null,
-        string $calendar = 'gregorian',
+        ?string $calendar = null,
         string $locale = null
     ): string {
         return $this->formatDateTime($date, $dateFormat, 'none', $pattern, $timezone, $calendar, $locale);
@@ -232,17 +233,17 @@ final class Formatter
         ?string $timeFormat,
         ?string $pattern,
         DateTimeZone $timezone,
-        string $calendar
+        ?string $calendar
     ): IntlDateFormatter {
         $dateType = null !== $dateFormat ? DateType::fromName($dateFormat) : $this->configuration->dateType;
         $timeType = null !== $timeFormat ? TimeType::fromName($timeFormat) : $this->configuration->timeType;
         $locale = $locale ?? Locale::getDefault();
-        $calendar = 'gregorian' === strtolower($calendar) ? IntlDateFormatter::GREGORIAN : IntlDateFormatter::TRADITIONAL;
+        $calendar = null !== $calendar ? Calendar::fromName($calendar) : $this->configuration->calendar;
         $pattern = $pattern ?? $this->configuration->datePattern;
 
-        $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar.'|'.$pattern;
+        $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.$pattern;
         if (!isset($this->dateFormatters[$hash])) {
-            $dateFormatter = new IntlDateFormatter($locale, $dateType->value, $timeType->value, $timezone, $calendar);
+            $dateFormatter = new IntlDateFormatter($locale, $dateType->value, $timeType->value, $timezone, $calendar->value);
             if (null !== $pattern) {
                 $dateFormatter->setPattern($pattern);
             }
