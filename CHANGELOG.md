@@ -2,6 +2,24 @@
 
 All Notable changes to `bakame/intl-formatter` will be documented in this file
 
+## [Next] - TBD
+
+### Added
+
+- None
+
+### Fixed
+
+- None
+
+### Deprecated
+
+- None
+
+### Removed
+
+- None
+
 ## [0.2.0] - 2022-06-06
 
 ### Added
@@ -27,5 +45,6 @@ All Notable changes to `bakame/intl-formatter` will be documented in this file
 
 **Initial release!**
 
-[Next]: https://github.com/bakame-php/intl-formatter/compare/0.1.0...main
+[Next]: https://github.com/bakame-php/intl-formatter/compare/0.2.0...main
+[0.2.0]: https://github.com/bakame-php/intl-formatter/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/bakame-php/intl-formatter/releases/tag/0.1.0
