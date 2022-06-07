@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
-use Bakame\Intl\Options\Calendar;
-use Bakame\Intl\Options\DateType;
-use Bakame\Intl\Options\NumberStyle;
 use Bakame\Intl\Options\NumberType;
-use Bakame\Intl\Options\TimeType;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
-use IntlDateFormatter;
-use Locale;
-use NumberFormatter;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Intl\Currencies;
 use Symfony\Component\Intl\Exception\MissingResourceException;
@@ -27,10 +20,6 @@ final class Formatter
     private DateFactory $dateFactory;
     private NumberFactory $numberFactory;
     private DateResolver $dateResolver;
-    /** @var array<IntlDateFormatter> */
-    private array $dateFormatters = [];
-    /** @var array<NumberFormatter> */
-    private array $numberFormatters = [];
 
     public function __construct(
         DateFactory $dateFactory,
@@ -138,7 +127,7 @@ final class Formatter
      */
     public function formatCurrency($amount, string $currency, string $locale = null, array $attrs = []): string
     {
-        $formatter = $this->createNumberFormatter($locale, NumberStyle::fromName('currency'), $attrs);
+        $formatter = $this->numberFactory->createNumberFormatter($locale, 'currency', $attrs);
         if (false === $ret = $formatter->formatCurrency($amount, $currency)) {
             // @codeCoverageIgnoreStart
             throw FailedFormatting::dueToNumberFormatter('Unable to format the given number as a currency.');
@@ -159,8 +148,7 @@ final class Formatter
         array $attrs = [],
         ?string $style = null
     ): string {
-        $style = null === $style ? $this->numberFactory->style : NumberStyle::fromName($style);
-        $formatter = $this->createNumberFormatter($locale, $style, $attrs);
+        $formatter = $this->numberFactory->createNumberFormatter($locale, $style, $attrs);
         if (false === $ret = $formatter->format($number, NumberType::fromName($type)->value)) {
             // @codeCoverageIgnoreStart
             throw FailedFormatting::dueToNumberFormatter('Unable to format the given number.');
@@ -191,7 +179,7 @@ final class Formatter
             throw FailedFormatting::dueToInvalidDate($exception);
         }
 
-        $formatter = $this->createDateFormatter($date->getTimezone(), $locale, $dateFormat, $timeFormat, $pattern, $calendar);
+        $formatter = $this->dateFactory->createDateFormatter($date->getTimezone(), $locale, $dateFormat, $timeFormat, $pattern, $calendar);
         if (false === $ret = $formatter->format($date)) {
             // @codeCoverageIgnoreStart
             throw FailedFormatting::dueToDateFormatter('Unable to format the given date.');
@@ -229,47 +217,5 @@ final class Formatter
         ?string $calendar = null
     ): string {
         return $this->formatDateTime($date, $locale, $timezone, 'none', $timeFormat, $pattern, $calendar);
-    }
-
-    private function createDateFormatter(
-        DateTimeZone $timezone,
-        ?string $locale,
-        ?string $dateFormat,
-        ?string $timeFormat,
-        ?string $pattern,
-        ?string $calendar
-    ): IntlDateFormatter {
-        $dateType = null !== $dateFormat ? DateType::fromName($dateFormat) : $this->dateFactory->dateType;
-        $timeType = null !== $timeFormat ? TimeType::fromName($timeFormat) : $this->dateFactory->timeType;
-        $locale = $locale ?? Locale::getDefault();
-        $calendar = null !== $calendar ? Calendar::fromName($calendar) : $this->dateFactory->calendar;
-        $pattern = $pattern ?? $this->dateFactory->pattern;
-
-        $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.$pattern;
-        if (!isset($this->dateFormatters[$hash])) {
-            $dateFormatter = new IntlDateFormatter($locale, $dateType->value, $timeType->value, $timezone, $calendar->value);
-            if (null !== $pattern) {
-                $dateFormatter->setPattern($pattern);
-            }
-            $this->dateFormatters[$hash] = $dateFormatter;
-        }
-
-        return $this->dateFormatters[$hash];
-    }
-
-    /**
-     * @param array<string, string|float|int> $attrs
-     */
-    private function createNumberFormatter(?string $locale, NumberStyle $style, array $attrs = []): NumberFormatter
-    {
-        $locale = $locale ?? Locale::getDefault();
-
-        ksort($attrs);
-        $hash = $locale.'|'.$style->value.'|'.json_encode($attrs);
-        if (!isset($this->numberFormatters[$hash])) {
-            $this->numberFormatters[$hash] = $this->numberFactory->newNumberFormatter($locale, $style, $attrs);
-        }
-
-        return $this->numberFormatters[$hash];
     }
 }

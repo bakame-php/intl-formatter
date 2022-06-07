@@ -8,6 +8,7 @@ use Bakame\Intl\Options\NumberAttribute;
 use Bakame\Intl\Options\NumberStyle;
 use Bakame\Intl\Options\SymbolAttribute;
 use Bakame\Intl\Options\TextAttribute;
+use Locale;
 use NumberFormatter;
 
 final class NumberFactory
@@ -31,6 +32,9 @@ final class NumberFactory
      * @var array<SymbolAttribute>
      */
     public array $symbolAttributes;
+
+    /** @var array<NumberFormatter> */
+    private array $numberFormatters = [];
 
     /**
      * @param array<NumberAttribute> $attributes
@@ -83,7 +87,7 @@ final class NumberFactory
             $settings['pattern'],
             self::filterNumberAttributes($settings['attributes']),
             self::filterTextAttributes($settings['textAttributes']),
-            self::filterSymboAttributes($settings['symbolAttributes']),
+            self::filterSymbolAttributes($settings['symbolAttributes']),
         );
     }
 
@@ -122,7 +126,7 @@ final class NumberFactory
      *
      * @return array<SymbolAttribute>
      */
-    private static function filterSymboAttributes(array $attributes): array
+    private static function filterSymbolAttributes(array $attributes): array
     {
         $res = [];
         foreach ($attributes as $name => $value) {
@@ -133,30 +137,35 @@ final class NumberFactory
     }
 
     /**
+     * @param array<string, string|float|int> $attrs
+     */
+    public function createNumberFormatter(?string $locale, ?string $style = null, array $attrs = []): NumberFormatter
+    {
+        $style = null !== $style ? NumberStyle::fromName($style) : $this->style;
+        $locale = $locale ?? Locale::getDefault();
+        ksort($attrs);
+        $hash = $locale.'|'.$style->value.'|'.json_encode($attrs);
+        if (!isset($this->numberFormatters[$hash])) {
+            $this->numberFormatters[$hash] = $this->newNumberFormatter($locale, $style, $attrs);
+        }
+
+        return $this->numberFormatters[$hash];
+    }
+
+    /**
      * Returns a new NumberFormatter.
      *
      * @param array<string, int|float|string> $extraAttributes
      */
-    public function newNumberFormatter(string $locale, NumberStyle $style, array $extraAttributes): NumberFormatter
+    private function newNumberFormatter(string $locale, ?NumberStyle $style = null, array $extraAttributes = []): NumberFormatter
     {
-        $instance = new NumberFormatter($locale, $style->value);
-        $this->addAttributes($instance, $extraAttributes);
+        $numberFormatter = new NumberFormatter($locale, ($style ?? $this->style)->value);
 
-        return $instance;
-    }
-
-    /**
-     * Add attributes to a NumberFormatter instance.
-     *
-     * @param array<string, int|float|string> $attributes
-     */
-    public function addAttributes(NumberFormatter $numberFormatter, array $attributes = []): void
-    {
         foreach ($this->attributes as $attribute) {
             $attribute->addTo($numberFormatter);
         }
 
-        foreach (self::filterNumberAttributes($attributes) as $attribute) {
+        foreach (self::filterNumberAttributes($extraAttributes) as $attribute) {
             $attribute->addTo($numberFormatter);
         }
 
@@ -171,5 +180,7 @@ final class NumberFactory
         if (null !== $this->pattern) {
             $numberFormatter->setPattern($this->pattern);
         }
+
+        return $numberFormatter;
     }
 }
