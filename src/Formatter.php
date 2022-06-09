@@ -125,7 +125,7 @@ final class Formatter
      * @param int|float $amount
      * @param array<string, int|float|string> $attrs
      */
-    public function formatCurrency($amount, string $currency, string $locale = null, array $attrs = []): string
+    public function formatCurrency($amount, string $currency, ?string $locale = null, array $attrs = []): string
     {
         $formatter = $this->numberFactory->createNumberFormatter($locale, 'currency', $attrs);
         if (false === $ret = $formatter->formatCurrency($amount, $currency)) {
@@ -143,7 +143,7 @@ final class Formatter
      */
     public function formatNumber(
         $number,
-        string $locale = null,
+        ?string $locale = null,
         string $type = 'default',
         array $attrs = [],
         ?string $style = null
@@ -166,7 +166,7 @@ final class Formatter
      */
     public function formatDateTime(
         $date,
-        string $locale = null,
+        ?string $locale = null,
         $timezone = null,
         ?string $dateFormat = null,
         ?string $timeFormat = null,
@@ -195,7 +195,7 @@ final class Formatter
      */
     public function formatDate(
         $date,
-        string $locale = null,
+        ?string $locale = null,
         $timezone = null,
         ?string $dateFormat = null,
         ?string $pattern = null,
@@ -210,7 +210,7 @@ final class Formatter
      */
     public function formatTime(
         $date,
-        string $locale = null,
+        ?string $locale = null,
         $timezone = null,
         ?string $timeFormat = null,
         ?string $pattern = null,

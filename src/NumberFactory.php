@@ -141,8 +141,8 @@ final class NumberFactory
      */
     public function createNumberFormatter(?string $locale, ?string $style = null, array $attrs = []): NumberFormatter
     {
-        $style = null !== $style ? NumberStyle::fromName($style) : $this->style;
         $locale = $locale ?? Locale::getDefault();
+        $style = null !== $style ? NumberStyle::fromName($style) : $this->style;
         ksort($attrs);
         $hash = $locale.'|'.$style->value.'|'.json_encode($attrs);
         if (!isset($this->numberFormatters[$hash])) {
@@ -157,24 +157,20 @@ final class NumberFactory
      *
      * @param array<string, int|float|string> $extraAttributes
      */
-    private function newNumberFormatter(string $locale, ?NumberStyle $style = null, array $extraAttributes = []): NumberFormatter
-    {
-        $numberFormatter = new NumberFormatter($locale, ($style ?? $this->style)->value);
+    private function newNumberFormatter(
+        string $locale,
+        NumberStyle $style,
+        array $extraAttributes = []
+    ): NumberFormatter {
+        $numberFormatter = new NumberFormatter($locale, $style->value);
 
-        foreach ($this->attributes as $attribute) {
+        foreach ([
+            ...$this->attributes,
+            ...self::filterNumberAttributes($extraAttributes),
+            ...$this->textAttributes,
+            ...$this->symbolAttributes,
+            ] as $attribute) {
             $attribute->addTo($numberFormatter);
-        }
-
-        foreach (self::filterNumberAttributes($extraAttributes) as $attribute) {
-            $attribute->addTo($numberFormatter);
-        }
-
-        foreach ($this->textAttributes as $textAttribute) {
-            $textAttribute->addTo($numberFormatter);
-        }
-
-        foreach ($this->symbolAttributes as $symbolAttribute) {
-            $symbolAttribute->addTo($numberFormatter);
         }
 
         if (null !== $this->pattern) {

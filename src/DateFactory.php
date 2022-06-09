@@ -28,7 +28,7 @@ final class DateFactory
         DateType $dateType,
         TimeType $timeType,
         Calendar $calendar,
-        ?string $pattern
+        ?string $pattern = null
     ) {
         $this->dateType = $dateType;
         $this->timeType = $timeType;
@@ -60,11 +60,11 @@ final class DateFactory
 
     public function createDateFormatter(
         DateTimeZone $timezone,
-        ?string $locale,
-        ?string $dateFormat,
-        ?string $timeFormat,
-        ?string $pattern,
-        ?string $calendar
+        ?string $locale = null,
+        ?string $dateFormat = null,
+        ?string $timeFormat = null,
+        ?string $pattern = null,
+        ?string $calendar = null
     ): IntlDateFormatter {
         $dateType = null !== $dateFormat ? DateType::fromName($dateFormat) : $this->dateType;
         $timeType = null !== $timeFormat ? TimeType::fromName($timeFormat) : $this->timeType;
