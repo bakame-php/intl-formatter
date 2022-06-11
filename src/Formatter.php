@@ -138,8 +138,10 @@ final class Formatter
     }
 
     /**
+     * @param 'default'|'int32'|'int64'|'double'|'currency' $type
      * @param int|float $number
      * @param array<string, int|float|string> $attrs
+     * @param 'decimal'|'currency'|'percent'|'scientific'|'spellout'|'ordinal'|'duration'|null $style
      */
     public function formatNumber(
         $number,
@@ -161,6 +163,9 @@ final class Formatter
     /**
      * @param DateTimeInterface|string|int|null $date A date or null to use the current time
      * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
+     * @param 'none'|'short'|'medium'|'long'|'full'|'relative_short'|'relative_medium'|'relative_long'|'relative_full'|null $dateFormat
+     * @param 'none'|'short'|'medium'|'long'|'full'|null $timeFormat
+     * @param 'gregorian'|'traditional'|null $calendar
      *
      * @throws FailedFormatting
      */
@@ -192,6 +197,8 @@ final class Formatter
     /**
      * @param DateTimeInterface|string|int|null $date A date or null to use the current time
      * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
+     * @param 'none'|'short'|'medium'|'long'|'full'|'relative_short'|'relative_medium'|'relative_long'|'relative_full'|null $dateFormat
+     * @param 'gregorian'|'traditional'|null $calendar
      */
     public function formatDate(
         $date,
@@ -207,6 +214,8 @@ final class Formatter
     /**
      * @param DateTimeInterface|string|int|null $date A date or null to use the current time
      * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
+     * @param 'none'|'short'|'medium'|'long'|'full'|null $timeFormat
+     * @param 'gregorian'|'traditional'|null $calendar
      */
     public function formatTime(
         $date,

@@ -84,7 +84,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatDate('2019-08-07 23:39:12', null, null, 'foobar');
+        $this->formatter->formatDate('2019-08-07 23:39:12', null, null, 'foobar'); /* @phpstan-ignore-line */
     }
 
     /** @test */
@@ -92,7 +92,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatTime('2019-08-07 23:39:12', null, null, 'foobar');
+        $this->formatter->formatTime('2019-08-07 23:39:12', null, null, 'foobar'); /* @phpstan-ignore-line */
     }
 
     /** @test */
@@ -100,7 +100,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', [], 'foobar');
+        $this->formatter->formatNumber(42, null, 'default', [], 'foobar'); /* @phpstan-ignore-line */
     }
 
     /** @test */
@@ -108,7 +108,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'foobar', [], 'decimal');
+        $this->formatter->formatNumber(42, null, 'foobar', [], 'decimal'); /* @phpstan-ignore-line */
     }
 
     /** @test */
