@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
-use Bakame\Intl\Options\NumberType;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
@@ -151,7 +150,7 @@ final class Formatter
         ?string $style = null
     ): string {
         $formatter = $this->numberFactory->createNumberFormatter($locale, $style, $attrs);
-        if (false === $ret = $formatter->format($number, NumberType::fromName($type)->value)) {
+        if (false === $ret = $formatter->format($number, Option\TypeFormat::from($type)->toIntlConstant())) {
             // @codeCoverageIgnoreStart
             throw FailedFormatting::dueToNumberFormatter('Unable to format the given number.');
             // @codeCoverageIgnoreEnd

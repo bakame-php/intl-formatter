@@ -4,32 +4,28 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
-use Bakame\Intl\Options\NumberAttribute;
-use Bakame\Intl\Options\NumberStyle;
-use Bakame\Intl\Options\SymbolAttribute;
-use Bakame\Intl\Options\TextAttribute;
 use Locale;
 use NumberFormatter;
 
 final class NumberFactory
 {
     /** @readonly */
-    public NumberStyle $style;
+    public Option\StyleFormat $style;
     /** @readonly */
     public ?string $pattern;
     /**
      * @readonly
-     * @var array<NumberAttribute>
+     * @var array<Option\AttributeOption>
      */
     public array $attributes;
     /**
      * @readonly
-     * @var array<TextAttribute>
+     * @var array<Option\TextOption>
      */
     public array $textAttributes;
     /**
      * @readonly
-     * @var array<SymbolAttribute>
+     * @var array<Option\SymbolOption>
      */
     public array $symbolAttributes;
 
@@ -37,16 +33,16 @@ final class NumberFactory
     private array $numberFormatters = [];
 
     /**
-     * @param array<NumberAttribute> $attributes
-     * @param array<TextAttribute> $textAttributes
-     * @param array<SymbolAttribute> $symbolAttributes
+     * @param array<Option\AttributeOption> $attributes
+     * @param array<Option\TextOption> $textAttributes
+     * @param array<Option\SymbolOption> $symbolAttributes
      */
     public function __construct(
-        NumberStyle $style,
-        ?string     $pattern = null,
-        array       $attributes = [],
-        array       $textAttributes = [],
-        array       $symbolAttributes = []
+        Option\StyleFormat $style,
+        ?string            $pattern = null,
+        array              $attributes = [],
+        array              $textAttributes = [],
+        array              $symbolAttributes = []
     ) {
         $this->style = $style;
         $this->pattern = $pattern;
@@ -83,7 +79,7 @@ final class NumberFactory
         }
 
         return new self(
-            NumberStyle::fromName($settings['style']),
+            Option\StyleFormat::from($settings['style']),
             $settings['pattern'],
             self::filterNumberAttributes($settings['attributes']),
             self::filterTextAttributes($settings['textAttributes']),
@@ -94,13 +90,13 @@ final class NumberFactory
     /**
      * @param array<string,int|float|string> $attributes
      *
-     * @return array<NumberAttribute>
+     * @return array<Option\AttributeOption>
      */
     private static function filterNumberAttributes(array $attributes): array
     {
         $res = [];
         foreach ($attributes as $name => $value) {
-            $res[] = NumberAttribute::from($name, $value);
+            $res[] = Option\AttributeOption::from($name, $value);
         }
 
         return $res;
@@ -109,13 +105,13 @@ final class NumberFactory
     /**
      * @param array<string,string> $attributes
      *
-     * @return array<TextAttribute>
+     * @return array<Option\TextOption>
      */
     private static function filterTextAttributes(array $attributes): array
     {
         $res = [];
         foreach ($attributes as $name => $value) {
-            $res[] = TextAttribute::from($name, $value);
+            $res[] = Option\TextOption::from($name, $value);
         }
 
         return $res;
@@ -124,13 +120,13 @@ final class NumberFactory
     /**
      * @param array<string,string> $attributes
      *
-     * @return array<SymbolAttribute>
+     * @return array<Option\SymbolOption>
      */
     private static function filterSymbolAttributes(array $attributes): array
     {
         $res = [];
         foreach ($attributes as $name => $value) {
-            $res[] = SymbolAttribute::from($name, $value);
+            $res[] = Option\SymbolOption::from($name, $value);
         }
 
         return $res;
@@ -142,7 +138,7 @@ final class NumberFactory
     public function createNumberFormatter(?string $locale, ?string $style = null, array $attrs = []): NumberFormatter
     {
         $locale = $locale ?? Locale::getDefault();
-        $style = null !== $style ? NumberStyle::fromName($style) : $this->style;
+        $style = null !== $style ? Option\StyleFormat::from($style) : $this->style;
         ksort($attrs);
         $hash = $locale.'|'.$style->value.'|'.json_encode($attrs);
         if (!isset($this->numberFormatters[$hash])) {
@@ -158,11 +154,11 @@ final class NumberFactory
      * @param array<string, int|float|string> $extraAttributes
      */
     private function newNumberFormatter(
-        string $locale,
-        NumberStyle $style,
-        array $extraAttributes = []
+        string             $locale,
+        Option\StyleFormat $style,
+        array              $extraAttributes = []
     ): NumberFormatter {
-        $numberFormatter = new NumberFormatter($locale, $style->value);
+        $numberFormatter = new NumberFormatter($locale, $style->toIntlConstant());
 
         foreach ([
             ...$this->attributes,

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
-use Bakame\Intl\Options\Calendar;
-use Bakame\Intl\Options\DateType;
-use Bakame\Intl\Options\TimeType;
 use IntlDateFormatter;
 use PHPUnit\Framework\TestCase;
 
@@ -16,16 +13,16 @@ final class DateFactoryTest extends TestCase
     public function it_can_be_instantiated_with_only_required_properties(): void
     {
         $config = new DateFactory(
-            DateType::fromName('full'),
-            TimeType::fromName('short'),
-            Calendar::fromName('traditional'),
+            Option\DateFormat::from('full'),
+            Option\TimeFormat::from('short'),
+            Option\CalendarFormat::from('traditional'),
             null
         );
 
         self::assertNull($config->pattern);
-        self::assertSame(IntlDateFormatter::TRADITIONAL, $config->calendar->value);
-        self::assertSame(IntlDateFormatter::FULL, $config->dateType->value);
-        self::assertSame(IntlDateFormatter::SHORT, $config->timeType->value);
+        self::assertSame(IntlDateFormatter::TRADITIONAL, $config->calendar->toIntlConstant());
+        self::assertSame(IntlDateFormatter::FULL, $config->dateType->toIntlConstant());
+        self::assertSame(IntlDateFormatter::SHORT, $config->timeType->toIntlConstant());
     }
 
     /** @test */
@@ -37,9 +34,9 @@ final class DateFactoryTest extends TestCase
             'calendar' => 'gregorian',
         ]);
         self::assertNull($config->pattern);
-        self::assertSame(IntlDateFormatter::GREGORIAN, $config->calendar->value);
-        self::assertSame(IntlDateFormatter::FULL, $config->dateType->value);
-        self::assertSame(IntlDateFormatter::SHORT, $config->timeType->value);
+        self::assertSame(IntlDateFormatter::GREGORIAN, $config->calendar->toIntlConstant());
+        self::assertSame(IntlDateFormatter::FULL, $config->dateType->toIntlConstant());
+        self::assertSame(IntlDateFormatter::SHORT, $config->timeType->toIntlConstant());
     }
 
     /** @test */
@@ -47,10 +44,6 @@ final class DateFactoryTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        DateFactory::fromAssociative([
-            'dateFormat' => 'full',
-            'timeFormat' => 'short',
-            'calendar' => 'foobar',
-        ]);
+        DateFactory::fromAssociative(['dateFormat' => 'full', 'timeFormat' => 'short', 'calendar' => 'foobar']); /* @phpstan-ignore-line */
     }
 }

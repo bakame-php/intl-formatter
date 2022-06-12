@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
-use Bakame\Intl\Options\Calendar;
-use Bakame\Intl\Options\DateType;
-use Bakame\Intl\Options\TimeType;
 use DateTimeZone;
 use IntlDateFormatter;
 use Locale;
@@ -14,21 +11,21 @@ use Locale;
 final class DateFactory
 {
     /** @readonly */
-    public DateType $dateType;
+    public Option\DateFormat $dateType;
     /** @readonly */
-    public TimeType $timeType;
+    public Option\TimeFormat $timeType;
     /* @readonly */
-    public Calendar $calendar;
+    public Option\CalendarFormat $calendar;
     /** @readonly */
     public ?string $pattern;
     /** @var array<IntlDateFormatter> */
     private array $dateFormatters = [];
 
     public function __construct(
-        DateType $dateType,
-        TimeType $timeType,
-        Calendar $calendar,
-        ?string $pattern = null
+        Option\DateFormat     $dateType,
+        Option\TimeFormat     $timeType,
+        Option\CalendarFormat $calendar,
+        ?string               $pattern = null
     ) {
         $this->dateType = $dateType;
         $this->timeType = $timeType;
@@ -38,9 +35,9 @@ final class DateFactory
 
     /**
      * @param array{
-     *     dateFormat:string,
-     *     timeFormat:string,
-     *     calendar:string,
+     *     dateFormat:'none'|'short'|'medium'|'long'|'full'|'relative_short'|'relative_medium'|'relative_long'|'relative_full',
+     *     timeFormat:'none'|'short'|'medium'|'long'|'full',
+     *     calendar:'gregorian'|'traditional',
      *     pattern?:?string,
      * } $settings
      */
@@ -51,13 +48,18 @@ final class DateFactory
         }
 
         return new self(
-            DateType::fromName($settings['dateFormat']),
-            TimeType::fromName($settings['timeFormat']),
-            Calendar::fromName($settings['calendar']),
+            Option\DateFormat::from($settings['dateFormat']),
+            Option\TimeFormat::from($settings['timeFormat']),
+            Option\CalendarFormat::from($settings['calendar']),
             $settings['pattern']
         );
     }
 
+    /**
+     * @param 'none'|'short'|'medium'|'long'|'full'|'relative_short'|'relative_medium'|'relative_long'|'relative_full'|null $dateFormat
+     * @param 'none'|'short'|'medium'|'long'|'full'|null $timeFormat
+     * @param 'traditional'|'gregorian'|null $calendar
+     */
     public function createDateFormatter(
         DateTimeZone $timezone,
         ?string $locale = null,
@@ -66,15 +68,15 @@ final class DateFactory
         ?string $pattern = null,
         ?string $calendar = null
     ): IntlDateFormatter {
-        $dateType = null !== $dateFormat ? DateType::fromName($dateFormat) : $this->dateType;
-        $timeType = null !== $timeFormat ? TimeType::fromName($timeFormat) : $this->timeType;
+        $dateType = null !== $dateFormat ? Option\DateFormat::from($dateFormat) : $this->dateType;
+        $timeType = null !== $timeFormat ? Option\TimeFormat::from($timeFormat) : $this->timeType;
         $locale = $locale ?? Locale::getDefault();
-        $calendar = null !== $calendar ? Calendar::fromName($calendar) : $this->calendar;
+        $calendar = null !== $calendar ? Option\CalendarFormat::from($calendar) : $this->calendar;
         $pattern = $pattern ?? $this->pattern;
 
         $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.$pattern;
         if (!isset($this->dateFormatters[$hash])) {
-            $dateFormatter = new IntlDateFormatter($locale, $dateType->value, $timeType->value, $timezone, $calendar->value);
+            $dateFormatter = new IntlDateFormatter($locale, $dateType->toIntlConstant(), $timeType->toIntlConstant(), $timezone, $calendar->toIntlConstant());
             if (null !== $pattern) {
                 $dateFormatter->setPattern($pattern);
             }

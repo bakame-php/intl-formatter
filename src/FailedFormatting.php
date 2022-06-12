@@ -27,37 +27,11 @@ final class FailedFormatting extends RuntimeException
     }
 
     /**
-     * @param array<string,mixed> $supported
+     * @param array<string> $supported
      */
     public static function dueToUnknownOptions(string $name, string $format, array $supported): self
     {
-        return new self('The '.$name.' "'.$format.'" does not exist; expecting one value of : "'.implode('", "', array_keys($supported)).'".');
-    }
-
-    /**
-     * @param array<string,mixed> $supported
-     */
-    public static function dueToUnknownNumberFormatterAttributeName(string $name, array $supported): self
-    {
-        return new self('The number formatter attribute "'.$name.'" does not exist, known attributes are: "'.implode('", "', array_keys($supported)).'".');
-    }
-
-    /**
-     * @param float|int|string $value
-     * @param array<string,mixed> $supported
-     */
-    public static function dueToUnknownNumberFormatterRoundingMode($value, array $supported): self
-    {
-        return new self('The number formatter rounding mode "'.$value.'" does not exist, known modes are: "'.implode('", "', array_keys($supported)).'".');
-    }
-
-    /**
-     * @param float|int|string $value
-     * @param array<string,mixed> $supported
-     */
-    public static function dueToUnknownNumberFormatterPaddingPosition($value, array $supported): self
-    {
-        return new self('The number formatter padding position "'.$value.'" does not exist, known positions are: "'.implode('", "', array_keys($supported)).'".');
+        return new self('The '.$name.' "'.$format.'" does not exist; expecting one value of : "'.implode('", "', $supported).'".');
     }
 
     /**

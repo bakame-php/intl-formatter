@@ -15,12 +15,12 @@ final class NumberFactoryTest extends TestCase
         $config = NumberFactory::fromAssociative(['style' => 'currency', 'attributes' => ['grouping_used' => 2]]);
 
         self::assertCount(1, $config->attributes);
-        self::assertSame(NumberFormatter::GROUPING_USED, $config->attributes[0]->name);
+        self::assertSame(NumberFormatter::GROUPING_USED, $config->attributes[0]->name->toIntlConstant());
         self::assertSame(2, $config->attributes[0]->value);
         self::assertCount(0, $config->textAttributes);
         self::assertCount(0, $config->symbolAttributes);
         self::assertEmpty($config->pattern);
-        self::assertSame(NumberFormatter::CURRENCY, $config->style->value);
+        self::assertSame(NumberFormatter::CURRENCY, $config->style->toIntlConstant());
     }
 
     /** @test */
@@ -32,7 +32,7 @@ final class NumberFactoryTest extends TestCase
         self::assertCount(0, $config->textAttributes);
         self::assertCount(0, $config->symbolAttributes);
         self::assertNull($config->pattern);
-        self::assertSame(NumberFormatter::CURRENCY, $config->style->value);
+        self::assertSame(NumberFormatter::CURRENCY, $config->style->toIntlConstant());
     }
 
     /** @test */
