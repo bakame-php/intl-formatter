@@ -2,7 +2,7 @@
 
 All Notable changes to `bakame/intl-formatter` will be documented in this file
 
-## [Next] - TBD
+## [0.3.0] - 2022-06-12
 
 ### Added
 
@@ -10,7 +10,9 @@ All Notable changes to `bakame/intl-formatter` will be documented in this file
 
 ### Fixed
 
-- None
+- Internal Option rewritten to use pseudo Enum classes.
+- `BackedEnumPolyfill` replaces `PseudoEnum` as the internal Enumeration abstract class.
+- Improve docblock using phpstan annotation.
 
 ### Deprecated
 
@@ -45,6 +47,7 @@ All Notable changes to `bakame/intl-formatter` will be documented in this file
 
 **Initial release!**
 
-[Next]: https://github.com/bakame-php/intl-formatter/compare/0.2.0...main
+[Next]: https://github.com/bakame-php/intl-formatter/compare/0.3.0...main
+[0.3.0]: https://github.com/bakame-php/intl-formatter/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/bakame-php/intl-formatter/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/bakame-php/intl-formatter/releases/tag/0.1.0
