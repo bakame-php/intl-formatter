@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
+use Bakame\Intl\Option\AttributeFormat;
+use Bakame\Intl\Option\PaddingPosition;
+use Bakame\Intl\Option\RoundingMode;
+use Bakame\Intl\Option\StyleFormat;
+use Bakame\Intl\Option\SymbolFormat;
+use Bakame\Intl\Option\TextFormat;
 use Locale;
 use NumberFormatter;
 
@@ -39,10 +45,10 @@ final class NumberFactory
      */
     public function __construct(
         Option\StyleFormat $style,
-        ?string            $pattern = null,
-        array              $attributes = [],
-        array              $textAttributes = [],
-        array              $symbolAttributes = []
+        ?string $pattern = null,
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbolAttributes = []
     ) {
         $this->style = $style;
         $this->pattern = $pattern;
@@ -53,11 +59,11 @@ final class NumberFactory
 
     /**
      * @param array{
-     *         style:string,
+     *         style:key-of<StyleFormat::INTL_MAPPER>,
      *         pattern?:?string,
-     *         attributes?:array<string, int|float|string>,
-     *         textAttributes?:array<string,string>,
-     *         symbolAttributes?:array<string,string>
+     *         attributes?:array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>>,
+     *         textAttributes?:array<key-of<TextFormat::INTL_MAPPER>,string>,
+     *         symbolAttributes?:array<key-of<SymbolFormat::INTL_MAPPER>,string>
      * } $settings
      */
     public static function fromAssociative(array $settings): self
@@ -88,7 +94,7 @@ final class NumberFactory
     }
 
     /**
-     * @param array<string,int|float|string> $attributes
+     * @param array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>> $attributes
      *
      * @return array<Option\AttributeOption>
      */
@@ -103,7 +109,7 @@ final class NumberFactory
     }
 
     /**
-     * @param array<string,string> $attributes
+     * @param array<key-of<TextFormat::INTL_MAPPER>, string> $attributes
      *
      * @return array<Option\TextOption>
      */
@@ -118,7 +124,7 @@ final class NumberFactory
     }
 
     /**
-     * @param array<string,string> $attributes
+     * @param array<key-of<SymbolFormat::INTL_MAPPER>, string> $attributes
      *
      * @return array<Option\SymbolOption>
      */
@@ -133,7 +139,7 @@ final class NumberFactory
     }
 
     /**
-     * @param array<string, string|float|int> $attrs
+     * @param array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>> $attrs
      */
     public function createNumberFormatter(?string $locale, ?string $style = null, array $attrs = []): NumberFormatter
     {
@@ -151,7 +157,7 @@ final class NumberFactory
     /**
      * Returns a new NumberFormatter.
      *
-     * @param array<string, int|float|string> $extraAttributes
+     * @param array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>> $extraAttributes
      */
     private function newNumberFormatter(
         string             $locale,

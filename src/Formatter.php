@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
+use Bakame\Intl\Option\AttributeFormat;
+use Bakame\Intl\Option\CalendarFormat;
+use Bakame\Intl\Option\DateFormat;
+use Bakame\Intl\Option\PaddingPosition;
+use Bakame\Intl\Option\RoundingMode;
+use Bakame\Intl\Option\StyleFormat;
+use Bakame\Intl\Option\TimeFormat;
+use Bakame\Intl\Option\TypeFormat;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
@@ -122,7 +130,7 @@ final class Formatter
 
     /**
      * @param int|float $amount
-     * @param array<string, int|float|string> $attrs
+     * @param array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>> $attrs
      */
     public function formatCurrency($amount, string $currency, ?string $locale = null, array $attrs = []): string
     {
@@ -137,10 +145,10 @@ final class Formatter
     }
 
     /**
-     * @param 'default'|'int32'|'int64'|'double'|'currency' $type
+     * @param key-of<TypeFormat::INTL_MAPPER> $type
      * @param int|float $number
-     * @param array<string, int|float|string> $attrs
-     * @param 'decimal'|'currency'|'percent'|'scientific'|'spellout'|'ordinal'|'duration'|null $style
+     * @param array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>> $attrs
+     * @param key-of<StyleFormat::INTL_MAPPER>|null $style
      */
     public function formatNumber(
         $number,
@@ -162,9 +170,9 @@ final class Formatter
     /**
      * @param DateTimeInterface|string|int|null $date A date or null to use the current time
      * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     * @param 'none'|'short'|'medium'|'long'|'full'|'relative_short'|'relative_medium'|'relative_long'|'relative_full'|null $dateFormat
-     * @param 'none'|'short'|'medium'|'long'|'full'|null $timeFormat
-     * @param 'gregorian'|'traditional'|null $calendar
+     * @param key-of<DateFormat::INTL_MAPPER>|null $dateFormat
+     * @param key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
+     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      *
      * @throws FailedFormatting
      */
@@ -196,8 +204,8 @@ final class Formatter
     /**
      * @param DateTimeInterface|string|int|null $date A date or null to use the current time
      * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     * @param 'none'|'short'|'medium'|'long'|'full'|'relative_short'|'relative_medium'|'relative_long'|'relative_full'|null $dateFormat
-     * @param 'gregorian'|'traditional'|null $calendar
+     * @param key-of<DateFormat::INTL_MAPPER>|null $dateFormat
+     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      */
     public function formatDate(
         $date,
@@ -213,8 +221,8 @@ final class Formatter
     /**
      * @param DateTimeInterface|string|int|null $date A date or null to use the current time
      * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     * @param 'none'|'short'|'medium'|'long'|'full'|null $timeFormat
-     * @param 'gregorian'|'traditional'|null $calendar
+     * @param key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
+     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      */
     public function formatTime(
         $date,

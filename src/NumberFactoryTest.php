@@ -40,10 +40,7 @@ final class NumberFactoryTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        NumberFactory::fromAssociative([
-            'style' => 'currency',
-            'attributes' => ['foobar' => 1],
-        ]);
+        NumberFactory::fromAssociative(['style' => 'currency', 'attributes' => ['foobar' => 1]]);  /* @phpstan-ignore-line */
     }
 
     /** @test */
@@ -51,9 +48,6 @@ final class NumberFactoryTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        NumberFactory::fromAssociative([
-            'style' => 'currency',
-            'attributes' => ['grouping_used' => '2'],
-        ]);
+        NumberFactory::fromAssociative(['style' => 'currency', 'attributes' => ['grouping_used' => '2']]); /* @phpstan-ignore-line */
     }
 }

@@ -116,7 +116,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['foobar' => 1]);
+        $this->formatter->formatNumber(42, null, 'default', ['foobar' => 1]);  /* @phpstan-ignore-line */
     }
 
     /** @test */
@@ -124,7 +124,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['rounding_mode' => 'foobar']);
+        $this->formatter->formatNumber(42, null, 'default', ['rounding_mode' => 'foobar']); /* @phpstan-ignore-line */
     }
 
     /** @test */
@@ -132,7 +132,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['padding_position' => 'foobar']);
+        $this->formatter->formatNumber(42, null, 'default', ['padding_position' => 'foobar']); /* @phpstan-ignore-line */
     }
 
     /** @test */
@@ -140,7 +140,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['grouping_used' => 'foobar']);
+        $this->formatter->formatNumber(42, null, 'default', ['grouping_used' => 'foobar']); /* @phpstan-ignore-line */
     }
 
     /**
