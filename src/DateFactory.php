@@ -13,27 +13,19 @@ use Locale;
 
 final class DateFactory
 {
-    /** @readonly */
-    public Option\DateFormat $dateType;
-    /** @readonly */
-    public Option\TimeFormat $timeType;
-    /* @readonly */
-    public Option\CalendarFormat $calendar;
-    /** @readonly */
-    public ?string $pattern;
     /** @var array<IntlDateFormatter> */
     private array $dateFormatters = [];
 
     public function __construct(
-        Option\DateFormat $dateType,
-        Option\TimeFormat $timeType,
-        Option\CalendarFormat $calendar,
-        ?string $pattern = null
+        /* @readonly */
+        public Option\DateFormat $dateType,
+        /* @readonly */
+        public Option\TimeFormat $timeType,
+        /* @readonly */
+        public Option\CalendarFormat $calendar,
+        /** @readonly */
+        public ?string $pattern = null
     ) {
-        $this->dateType = $dateType;
-        $this->timeType = $timeType;
-        $this->calendar = $calendar;
-        $this->pattern = $pattern;
     }
 
     /**

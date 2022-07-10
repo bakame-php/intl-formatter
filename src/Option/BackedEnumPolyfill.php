@@ -35,18 +35,12 @@ abstract class BackedEnumPolyfill
         $this->value = $value;
     }
 
-    /**
-     * @return static
-     */
-    public static function from(string $name): self
+    public static function from(string $name): static
     {
         return new static($name);
     }
 
-    /**
-     * @return static
-     */
-    public static function fromIntlConstant(int $value): self
+    public static function fromIntlConstant(int $value): static
     {
         /** @var string|false $name */
         $name = array_search($value, static::INTL_MAPPER, true);
@@ -57,16 +51,7 @@ abstract class BackedEnumPolyfill
         return static::from($name);
     }
 
-    public function toIntlConstant(): int
-    {
-        return static::INTL_MAPPER[$this->value];
-    }
-
-
-    /**
-     * @return static
-     */
-    public static function tryFrom(string $value): ?self
+    public static function tryFrom(string $value): ?static
     {
         try {
             return static::from($value);
@@ -92,10 +77,8 @@ abstract class BackedEnumPolyfill
 
     /**
      * @param array<mixed> $args
-     *
-     * @return static
      */
-    public static function __callStatic(string $method, array $args = []): self
+    public static function __callStatic(string $method, array $args = []): static
     {
         try {
             /** @var string $const */
@@ -121,11 +104,16 @@ abstract class BackedEnumPolyfill
         foreach ($reflection->getReflectionConstants() as $reflConstant) {
             if ($reflConstant->isPublic()) {
                 /** @var string $value */
-                $value =  $reflConstant->getValue();
+                $value = $reflConstant->getValue();
                 static::$constants[static::class][$reflConstant->getName()] = $value;
             }
         }
 
         return static::$constants[static::class];
+    }
+
+    public function toIntlConstant(): int
+    {
+        return static::INTL_MAPPER[$this->value];
     }
 }

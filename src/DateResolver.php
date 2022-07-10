@@ -12,11 +12,9 @@ use Exception;
 
 final class DateResolver
 {
-    private DateTimeZone $timezone;
-
-    private function __construct(DateTimeZone $timezone)
-    {
-        $this->timezone = $timezone;
+    private function __construct(
+        private DateTimeZone $timezone
+    ) {
     }
 
     public static function fromSystem(): self
@@ -72,18 +70,11 @@ final class DateResolver
      */
     private function determineTheTimezone($timezone): ?DateTimeZone
     {
-        if (null === $timezone) {
-            return $this->timezone;
-        }
-
-        if (false === $timezone) {
-            return null;
-        }
-
-        if ($timezone instanceof DateTimeZone) {
-            return $timezone;
-        }
-
-        return new DateTimeZone($timezone);
+        return match (true) {
+            null === $timezone => $this->timezone,
+            false === $timezone => null,
+            $timezone instanceof DateTimeZone => $timezone,
+            default => new DateTimeZone($timezone),
+        };
     }
 }

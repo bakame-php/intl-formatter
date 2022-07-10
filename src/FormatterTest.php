@@ -100,7 +100,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', [], 'foobar'); /* @phpstan-ignore-line */
+        $this->formatter->formatNumber(42, null, 'default', [], 'foobar');
     }
 
     /** @test */
@@ -108,7 +108,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'foobar', [], 'decimal'); /* @phpstan-ignore-line */
+        $this->formatter->formatNumber(42, null, 'foobar', [], 'decimal');
     }
 
     /** @test */
@@ -116,7 +116,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['foobar' => 1]);  /* @phpstan-ignore-line */
+        $this->formatter->formatNumber(42, null, 'default', ['foobar' => 1]);
     }
 
     /** @test */
@@ -124,7 +124,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['rounding_mode' => 'foobar']); /* @phpstan-ignore-line */
+        $this->formatter->formatNumber(42, null, 'default', ['rounding_mode' => 'foobar']);
     }
 
     /** @test */
@@ -132,7 +132,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['padding_position' => 'foobar']); /* @phpstan-ignore-line */
+        $this->formatter->formatNumber(42, null, 'default', ['padding_position' => 'foobar']);
     }
 
     /** @test */
@@ -140,7 +140,7 @@ final class FormatterTest extends TestCase
     {
         $this->expectException(FailedFormatting::class);
 
-        $this->formatter->formatNumber(42, null, 'default', ['grouping_used' => 'foobar']); /* @phpstan-ignore-line */
+        $this->formatter->formatNumber(42, null, 'default', ['grouping_used' => 'foobar']);
     }
 
     /**
