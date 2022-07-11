@@ -33,14 +33,13 @@ final class DateResolver
     }
 
     /**
-     * @param DateTimeInterface|string|int|null $date A date or null to use the current time
-     * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     *
      * @throws Exception
      */
-    public function resolve($date, $timezone): DateTimeInterface
-    {
-        $timezone = $this->determineTheTimezone($timezone);
+    public function resolve(
+        DateTimeInterface|string|int|null $date,
+        DateTimeZone|string|false|null $timezone
+    ): DateTimeInterface {
+        $timezone = $this->getDateTimeZone($timezone);
         if ($date instanceof DateTimeImmutable) {
             return null !== $timezone ? $date->setTimezone($timezone) : $date;
         }
@@ -65,10 +64,7 @@ final class DateResolver
         return new DateTimeImmutable($asString, $timezone);
     }
 
-    /**
-     * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     */
-    private function determineTheTimezone($timezone): ?DateTimeZone
+    private function getDateTimeZone(DateTimeZone|string|false|null $timezone): ?DateTimeZone
     {
         return match (true) {
             null === $timezone => $this->timezone,
