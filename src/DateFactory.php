@@ -51,22 +51,37 @@ final class DateFactory
     }
 
     /**
-     * @param key-of<DateFormat::INTL_MAPPER>|null $dateFormat
-     * @param key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
-     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
+     * @param DateFormat|key-of<DateFormat::INTL_MAPPER>|null $dateFormat
+     * @param TimeFormat|key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
+     * @param CalendarFormat|key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      */
     public function createDateFormatter(
         DateTimeZone $timezone,
         ?string $locale = null,
-        ?string $dateFormat = null,
-        ?string $timeFormat = null,
+        Option\DateFormat|string|null $dateFormat = null,
+        Option\TimeFormat|string|null $timeFormat = null,
         ?string $pattern = null,
-        ?string $calendar = null
+        Option\CalendarFormat|string|null $calendar = null
     ): IntlDateFormatter {
-        $dateType = null !== $dateFormat ? Option\DateFormat::from($dateFormat) : $this->dateType;
-        $timeType = null !== $timeFormat ? Option\TimeFormat::from($timeFormat) : $this->timeType;
+        $dateType = match (true) {
+            null === $dateFormat => $this->dateType,
+            is_string($dateFormat) => Option\DateFormat::from($dateFormat),
+            default => $dateFormat,
+        };
+
+        $timeType = match (true) {
+            null === $timeFormat => $this->timeType,
+            is_string($timeFormat) => Option\DateFormat::from($timeFormat),
+            default => $timeFormat,
+        };
+
+        $calendar = match (true) {
+            null === $calendar => $this->calendar,
+            is_string($calendar) => Option\CalendarFormat::from($calendar),
+            default => $calendar,
+        };
+
         $locale = $locale ?? Locale::getDefault();
-        $calendar = null !== $calendar ? Option\CalendarFormat::from($calendar) : $this->calendar;
         $pattern = $pattern ?? $this->pattern;
 
         $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.$pattern;

@@ -130,10 +130,18 @@ final class NumberFactory
     /**
      * @param array<string, int|float|string> $attrs
      */
-    public function createNumberFormatter(?string $locale, ?string $style = null, array $attrs = []): NumberFormatter
-    {
+    public function createNumberFormatter(
+        ?string $locale,
+        Option\StyleFormat|string|null $style = null,
+        array $attrs = []
+    ): NumberFormatter {
         $locale = $locale ?? Locale::getDefault();
-        $style = null !== $style ? Option\StyleFormat::from($style) : $this->style;
+        $style = match (true) {
+            null === $style => $this->style,
+            is_string($style) =>  Option\StyleFormat::from($style),
+            default => $style,
+        };
+
         ksort($attrs);
         $hash = $locale.'|'.$style->value.'|'.json_encode($attrs);
         if (!isset($this->numberFormatters[$hash])) {
