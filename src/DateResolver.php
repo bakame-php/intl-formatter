@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
+use Stringable;
 
 final class DateResolver
 {
@@ -36,10 +37,16 @@ final class DateResolver
      * @throws Exception
      */
     public function resolve(
-        DateTimeInterface|string|int|null $date,
+        DateTimeInterface|Stringable|string|int|null $date,
         DateTimeZone|string|false|null $timezone
     ): DateTimeInterface {
-        $timezone = $this->getDateTimeZone($timezone);
+        $timezone = match (true) {
+            null === $timezone => $this->timezone,
+            false === $timezone => null,
+            $timezone instanceof DateTimeZone => $timezone,
+            default => new DateTimeZone($timezone),
+        };
+
         if ($date instanceof DateTimeImmutable) {
             return null !== $timezone ? $date->setTimezone($timezone) : $date;
         }
@@ -62,15 +69,5 @@ final class DateResolver
         }
 
         return new DateTimeImmutable($asString, $timezone);
-    }
-
-    private function getDateTimeZone(DateTimeZone|string|false|null $timezone): ?DateTimeZone
-    {
-        return match (true) {
-            null === $timezone => $this->timezone,
-            false === $timezone => null,
-            $timezone instanceof DateTimeZone => $timezone,
-            default => new DateTimeZone($timezone),
-        };
     }
 }
