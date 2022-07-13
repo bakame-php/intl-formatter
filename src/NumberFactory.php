@@ -128,6 +128,7 @@ final class NumberFactory
     }
 
     /**
+     * @param Option\StyleFormat|key-of<Option\StyleFormat::INTL_MAPPER>|null $style
      * @param array<string, int|float|string> $attrs
      */
     public function createNumberFormatter(

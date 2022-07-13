@@ -134,7 +134,9 @@ final class Formatter
     }
 
     /**
+     * @param Option\TypeFormat|key-of<Option\TypeFormat::INTL_MAPPER> $type
      * @param array<string, int|float|string> $attrs
+     * @param Option\StyleFormat|key-of<Option\StyleFormat::INTL_MAPPER>|null $style
      */
     public function formatNumber(
         int|float $number,
