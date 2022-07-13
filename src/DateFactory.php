@@ -65,26 +65,29 @@ final class DateFactory
     ): IntlDateFormatter {
         $dateType = match (true) {
             null === $dateFormat => $this->dateType,
-            is_string($dateFormat) => Option\DateFormat::from($dateFormat),
-            default => $dateFormat,
+            $dateFormat instanceof Option\DateFormat => $dateFormat,
+            default => Option\DateFormat::from($dateFormat),
         };
 
         $timeType = match (true) {
             null === $timeFormat => $this->timeType,
-            is_string($timeFormat) => Option\DateFormat::from($timeFormat),
-            default => $timeFormat,
+            $timeFormat instanceof Option\TimeFormat => $timeFormat,
+            default => Option\TimeFormat::from($timeFormat),
         };
 
         $calendar = match (true) {
             null === $calendar => $this->calendar,
-            is_string($calendar) => Option\CalendarFormat::from($calendar),
-            default => $calendar,
+            $calendar instanceof Option\CalendarFormat => $calendar,
+            default => Option\CalendarFormat::from($calendar),
         };
 
         $locale = $locale ?? Locale::getDefault();
         $pattern = $pattern ?? $this->pattern;
+        $hash = json_encode([
+            'locale' => $locale, 'dataType' => $dateType->value, 'timeType' => $timeType->value,
+            'timezone' => $timezone->getName(), 'calendar' => $calendar->value, 'pattern' => $pattern,
+        ]);
 
-        $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.$pattern;
         if (!isset($this->dateFormatters[$hash])) {
             $dateFormatter = new IntlDateFormatter(
                 $locale,
