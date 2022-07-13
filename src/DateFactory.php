@@ -83,10 +83,7 @@ final class DateFactory
 
         $locale = $locale ?? Locale::getDefault();
         $pattern = $pattern ?? $this->pattern;
-        $hash = json_encode([
-            'locale' => $locale, 'dataType' => $dateType->value, 'timeType' => $timeType->value,
-            'timezone' => $timezone->getName(), 'calendar' => $calendar->value, 'pattern' => $pattern,
-        ]);
+        $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.json_encode($pattern);
 
         if (!isset($this->dateFormatters[$hash])) {
             $dateFormatter = new IntlDateFormatter(

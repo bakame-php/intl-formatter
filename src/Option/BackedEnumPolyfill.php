@@ -15,9 +15,7 @@ use Throwable;
 abstract class BackedEnumPolyfill
 {
     protected const INTL_MAPPER = [];
-    /**
-     * @var array<class-string,array<string, string>>
-     */
+    /** @var array<class-string,array<string, string>> */
     protected static array $constants = [];
     protected static string $description = '';
 

@@ -144,7 +144,7 @@ final class NumberFactory
         };
 
         ksort($attrs);
-        $hash = json_encode(['locale' => $locale, 'style' => $style->value, 'attributes' => json_encode($attrs)]);
+        $hash = $locale.'|'.$style->value.'|'.json_encode($attrs);
         if (!isset($this->numberFormatters[$hash])) {
             $this->numberFormatters[$hash] = $this->newNumberFormatter($locale, $style, $attrs);
         }
