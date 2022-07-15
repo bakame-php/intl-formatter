@@ -6,6 +6,13 @@ namespace Bakame\Intl\Option;
 
 use NumberFormatter;
 
+/**
+ * @method static self Default()
+ * @method static self Int32()
+ * @method static self Int64()
+ * @method static self Double()
+ * @method static self Currency()
+ */
 final class TypeFormat extends BackedEnumPolyfill
 {
     public const Default = 'default';

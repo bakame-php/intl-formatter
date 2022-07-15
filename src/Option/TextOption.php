@@ -8,16 +8,12 @@ use NumberFormatter;
 
 final class TextOption
 {
-    /** @readonly */
-    public string $value;
-
-    /** @readonly */
-    public TextFormat $name;
-
-    private function __construct(TextFormat $name, string $value)
-    {
-        $this->value = $value;
-        $this->name = $name;
+    private function __construct(
+        /** @readonly */
+        public TextFormat $name,
+        /** @readonly */
+        public string $value
+    ) {
     }
 
     public static function from(string $name, string $value): self

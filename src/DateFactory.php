@@ -13,27 +13,19 @@ use Locale;
 
 final class DateFactory
 {
-    /** @readonly */
-    public Option\DateFormat $dateType;
-    /** @readonly */
-    public Option\TimeFormat $timeType;
-    /* @readonly */
-    public Option\CalendarFormat $calendar;
-    /** @readonly */
-    public ?string $pattern;
     /** @var array<IntlDateFormatter> */
     private array $dateFormatters = [];
 
     public function __construct(
-        Option\DateFormat $dateType,
-        Option\TimeFormat $timeType,
-        Option\CalendarFormat $calendar,
-        ?string $pattern = null
+        /* @readonly */
+        public Option\DateFormat $dateType,
+        /* @readonly */
+        public Option\TimeFormat $timeType,
+        /* @readonly */
+        public Option\CalendarFormat $calendar,
+        /** @readonly */
+        public ?string $pattern = null
     ) {
-        $this->dateType = $dateType;
-        $this->timeType = $timeType;
-        $this->calendar = $calendar;
-        $this->pattern = $pattern;
     }
 
     /**
@@ -59,25 +51,40 @@ final class DateFactory
     }
 
     /**
-     * @param key-of<DateFormat::INTL_MAPPER>|null $dateFormat
-     * @param key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
-     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
+     * @param DateFormat|key-of<DateFormat::INTL_MAPPER>|null $dateFormat
+     * @param TimeFormat|key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
+     * @param CalendarFormat|key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      */
     public function createDateFormatter(
         DateTimeZone $timezone,
         ?string $locale = null,
-        ?string $dateFormat = null,
-        ?string $timeFormat = null,
+        Option\DateFormat|string|null $dateFormat = null,
+        Option\TimeFormat|string|null $timeFormat = null,
         ?string $pattern = null,
-        ?string $calendar = null
+        Option\CalendarFormat|string|null $calendar = null
     ): IntlDateFormatter {
-        $dateType = null !== $dateFormat ? Option\DateFormat::from($dateFormat) : $this->dateType;
-        $timeType = null !== $timeFormat ? Option\TimeFormat::from($timeFormat) : $this->timeType;
-        $locale = $locale ?? Locale::getDefault();
-        $calendar = null !== $calendar ? Option\CalendarFormat::from($calendar) : $this->calendar;
-        $pattern = $pattern ?? $this->pattern;
+        $dateType = match (true) {
+            null === $dateFormat => $this->dateType,
+            $dateFormat instanceof Option\DateFormat => $dateFormat,
+            default => Option\DateFormat::from($dateFormat),
+        };
 
-        $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.$pattern;
+        $timeType = match (true) {
+            null === $timeFormat => $this->timeType,
+            $timeFormat instanceof Option\TimeFormat => $timeFormat,
+            default => Option\TimeFormat::from($timeFormat),
+        };
+
+        $calendar = match (true) {
+            null === $calendar => $this->calendar,
+            $calendar instanceof Option\CalendarFormat => $calendar,
+            default => Option\CalendarFormat::from($calendar),
+        };
+
+        $locale = $locale ?? Locale::getDefault();
+        $pattern = $pattern ?? $this->pattern;
+        $hash = $locale.'|'.$dateType->value.'|'.$timeType->value.'|'.$timezone->getName().'|'.$calendar->value.'|'.json_encode($pattern);
+
         if (!isset($this->dateFormatters[$hash])) {
             $dateFormatter = new IntlDateFormatter(
                 $locale,

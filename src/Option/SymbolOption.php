@@ -8,16 +8,12 @@ use NumberFormatter;
 
 final class SymbolOption
 {
-    /** @readonly */
-    public SymbolFormat $name;
-
-    /** @readonly */
-    public string $value;
-
-    private function __construct(SymbolFormat $name, string $value)
-    {
-        $this->value = $value;
-        $this->name = $name;
+    private function __construct(
+        /** @readonly */
+        public SymbolFormat $name,
+        /** @readonly */
+        public string $value
+    ) {
     }
 
     public static function from(string $name, string $value): self

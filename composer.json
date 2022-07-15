@@ -34,8 +34,8 @@
     },
     "require": {
         "ext-json": "*",
-        "php": "^7.4 || ^8.0",
-        "symfony/intl": "^5.0||^6.0",
+        "php": "^8.0",
+        "symfony/intl": "^6.0",
         "ext-intl": "*"
     },
     "require-dev": {
