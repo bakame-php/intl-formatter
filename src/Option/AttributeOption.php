@@ -13,7 +13,7 @@ final class AttributeOption
         /** @readonly */
         public AttributeFormat $name,
         /** @readonly */
-        public int|float $value
+        public int|float|RoundingMode|PaddingPosition $value
     ) {
     }
 
@@ -23,14 +23,17 @@ final class AttributeOption
 
         return match (true) {
             !is_string($value) => new self($attributeName, $value),
-            NumberFormatter::ROUNDING_MODE === $attributeName->toIntlConstant() => new self($attributeName, RoundingMode::from($value)->toIntlConstant()),
-            NumberFormatter::PADDING_POSITION === $attributeName->toIntlConstant() => new self($attributeName, PaddingPosition::from($value)->toIntlConstant()),
+            AttributeFormat::RoundingMode() === $attributeName => new self($attributeName, RoundingMode::from($value)),
+            AttributeFormat::PaddingPosition() === $attributeName => new self($attributeName, PaddingPosition::from($value)),
             default => throw FailedFormatting::dueToInvalidNumberFormatterAttributeValue($name, $value),
         };
     }
 
     public function addTo(NumberFormatter $numberFormatter): void
     {
-        $numberFormatter->setAttribute($this->name->toIntlConstant(), $this->value);
+        $numberFormatter->setAttribute($this->name->toIntlConstant(), match (true) {
+            is_object($this->value) => $this->value->toIntlConstant(),
+            default => $this->value,
+        });
     }
 }

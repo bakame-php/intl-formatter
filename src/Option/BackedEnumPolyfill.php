@@ -7,6 +7,7 @@ namespace Bakame\Intl\Option;
 use Bakame\Intl\FailedFormatting;
 use LogicException;
 use ReflectionClass;
+use ReflectionClassConstant;
 use Throwable;
 
 /**
@@ -15,8 +16,8 @@ use Throwable;
 abstract class BackedEnumPolyfill
 {
     protected const INTL_MAPPER = [];
-    /** @var array<class-string,array<string, string>> */
-    protected static array $constants = [];
+    /** @var array<class-string,array<array{name:string, value:static}>> */
+    protected static array $cases = [];
     protected static string $description = '';
 
     /** @readonly */
@@ -24,38 +25,81 @@ abstract class BackedEnumPolyfill
 
     final protected function __construct(string $value)
     {
-        /** @var string|false $name */
-        $name = array_search($value, static::constants(), true);
-        if (!is_string($name)) {
-            throw FailedFormatting::dueToUnknownOptions(static::$description, $value, static::constants());
-        }
-
         $this->value = $value;
     }
 
-    public static function from(string $name): static
+    final public static function from(string $name): static
     {
-        return new static($name);
+        static::cases();
+
+        if (!isset(static::$cases[static::class][$name])) {
+            throw FailedFormatting::dueToUnknownOptions(static::$description, $name, array_keys(static::$cases[static::class]));
+        }
+
+        return static::$cases[static::class][$name]['value'];
     }
 
-    public static function fromIntlConstant(int $value): static
+    final public static function tryFrom(string $value): ?static
+    {
+        try {
+            return static::from($value);
+        } catch (FailedFormatting) {
+            return null;
+        }
+    }
+
+    /**
+     * @return array<static>
+     */
+    final public static function cases(): array
+    {
+        if (!array_key_exists(static::class, static::$cases)) {
+            $reflection = new ReflectionClass(static::class);
+            static::$cases[static::class] = array_reduce(
+                $reflection->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC),
+                function (array $curry, ReflectionClassConstant $constant): array {
+                    /** @var string $value */
+                    $value = $constant->getValue();
+                    $curry[$value] = ['name' => $constant->getName(), 'value' => new static($value)];
+
+                    return $curry;
+                },
+                []
+            );
+        }
+
+        return array_values(array_column(static::$cases[static::class], 'value'));
+    }
+
+    final public static function fromIntlConstant(int $value): static
     {
         /** @var string|false $name */
         $name = array_search($value, static::INTL_MAPPER, true);
-        if (!is_string($name)) {
+        if (false === $name) {
             throw new FailedFormatting('Unsupported constants.');
         }
 
         return static::from($name);
     }
 
-    public static function tryFrom(string $value): ?static
+    /**
+     * @param array<mixed> $args
+     */
+    final public static function __callStatic(string $method, array $args = []): static
     {
         try {
-            return static::from($value);
-        } catch (FailedFormatting $exception) {
-            return null;
+            /** @var string $const */
+            $const = constant(static::class.'::'.$method);
+        } catch (Throwable) {
+            throw FailedFormatting::dueToUnknownOptions(static::$description, $method, array_values(array_column(static::$cases[static::class], 'name')));
         }
+
+        return static::from($const);
+    }
+
+    final public function toIntlConstant(): int
+    {
+        return static::INTL_MAPPER[$this->value];
     }
 
     final public function __clone()
@@ -65,53 +109,11 @@ abstract class BackedEnumPolyfill
 
     final public function __sleep()
     {
-        throw new LogicException('Enums are not cloneable');
+        throw new LogicException('Enums are not serializable');
     }
 
     final public function __wakeup()
     {
         throw new LogicException('Enums are not serializable');
-    }
-
-    /**
-     * @param array<mixed> $args
-     */
-    public static function __callStatic(string $method, array $args = []): static
-    {
-        try {
-            /** @var string $const */
-            $const = constant(static::class.'::'.$method);
-        } catch (Throwable $exception) {
-            throw FailedFormatting::dueToUnknownOptions(static::$description, $method, array_keys(static::constants()));
-        }
-
-        return static::from($const);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    final protected static function constants(): array
-    {
-        if (array_key_exists(static::class, static::$constants)) {
-            return static::$constants[static::class];
-        }
-
-        static::$constants[static::class] = [];
-        $reflection = new ReflectionClass(static::class);
-        foreach ($reflection->getReflectionConstants() as $reflConstant) {
-            if ($reflConstant->isPublic()) {
-                /** @var string $value */
-                $value = $reflConstant->getValue();
-                static::$constants[static::class][$reflConstant->getName()] = $value;
-            }
-        }
-
-        return static::$constants[static::class];
-    }
-
-    public function toIntlConstant(): int
-    {
-        return static::INTL_MAPPER[$this->value];
     }
 }
