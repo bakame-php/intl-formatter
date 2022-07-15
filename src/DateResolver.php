@@ -25,7 +25,7 @@ final class DateResolver
 
     public static function fromTimeZoneIdentifier(string $identifier): self
     {
-        return new self(new DateTimeZone($identifier));
+        return self::fromTimeZone(new DateTimeZone($identifier));
     }
 
     public static function fromTimeZone(DateTimeZone $timezone): self
