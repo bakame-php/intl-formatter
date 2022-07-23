@@ -71,17 +71,6 @@ abstract class BackedEnumPolyfill
         return array_values(array_column(static::$cases[static::class], 'value'));
     }
 
-    final public static function fromIntlConstant(int $value): static
-    {
-        /** @var string|false $name */
-        $name = array_search($value, static::INTL_MAPPER, true);
-        if (false === $name) {
-            throw new FailedFormatting('Unsupported constants.');
-        }
-
-        return static::from($name);
-    }
-
     /**
      * @param array<mixed> $args
      */
@@ -95,6 +84,17 @@ abstract class BackedEnumPolyfill
         }
 
         return static::from($const);
+    }
+
+    final public static function fromIntlConstant(int $value): static
+    {
+        /** @var string|false $name */
+        $name = array_search($value, static::INTL_MAPPER, true);
+        if (false === $name) {
+            throw new FailedFormatting('Unsupported constants.');
+        }
+
+        return static::from($name);
     }
 
     final public function toIntlConstant(): int
