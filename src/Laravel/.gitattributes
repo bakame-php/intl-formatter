@@ -1,0 +1,9 @@
+* text=auto
+
+/.gitattributes     export-ignore
+/.github            export-ignore
+/test_files         export-ignore
+/CHANGELOG.md       export-ignore
+/README.md          export-ignore
+/**/*Test.php       export-ignore
+/**/Test**          export-ignore

@@ -1,0 +1,67 @@
+{
+    "name": "bakame/laravel-intl-formatter",
+    "type": "library",
+    "description": "Global helpers for internalization in Laravel application",
+    "keywords": ["blade", "intl", "laravel", "date", "number", "formatter", "internalization"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name" : "Ignace Nyamagana Butera",
+            "email" : "nyamsprod@gmail.com",
+            "homepage" : "https://github.com/nyamsprod/",
+            "role" : "Developer"
+        }
+    ],
+    "support": {
+        "docs": "https://github.com/bakame-php/laravel-intl-formatter",
+        "issues": "https://github.com/bakame-php/laravel-intl-formatter/issues",
+        "source": "https://github.com/bakame-php/laravel-intl-formatter"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/nyamsprod"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Bakame\\Intl\\Laravel\\": ""
+        },
+        "files": [
+            "src/helpers.php"
+        ],
+        "exclude-from-classmap": [
+            "src/**Test.php"
+        ]
+    },
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "bakame/intl-formatter": "~0.3.0",
+        "illuminate/config": "^8.0 || ^9.0",
+        "illuminate/support": "^8.0 || ^9.0"
+    },
+    "suggest": {
+        "moneyphp/money": "To format currency based on the Money library"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Bakame\\Intl\\Laravel\\Provider"
+            ],
+            "aliases": {
+                "IntlFormatter": "Bakame\\Intl\\Laravel\\IntlFormatter",
+                "IntlFactory": "Bakame\\Intl\\Laravel\\IntlFactory"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
