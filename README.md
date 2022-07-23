@@ -14,7 +14,7 @@ by providing classes to format locale, language, timezones, currency and dates.
 System Requirements
 -------
 
-- PHP7.4+
+- PHP8.0+
 - Symfony Intl component
 
 Installation
@@ -49,7 +49,7 @@ The library:
 To run the tests, run the following command from the project folder.
 
 ``` bash
-$ composer test
+composer test
 ```
 
 Security

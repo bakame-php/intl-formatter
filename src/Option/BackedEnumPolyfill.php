@@ -72,7 +72,7 @@ abstract class BackedEnumPolyfill
     }
 
     /**
-     * @param array<mixed> $args
+     * @param mixed[] $args
      */
     final public static function __callStatic(string $method, array $args = []): static
     {
