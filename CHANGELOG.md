@@ -2,6 +2,24 @@
 
 All Notable changes to `bakame/intl-formatter` will be documented in this file
 
+## [Next] - TBD
+
+### Added
+
+- Support for direct `Enum` Options in formatting methods signature
+
+### Fixed
+
+- `BackedEnumPolyfill` polyfill improved.
+
+### Deprecated
+
+- None
+
+### Removed
+
+- Support for PHP7
+
 ## [0.3.0] - 2022-06-12
 
 ### Added
