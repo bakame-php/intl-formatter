@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Bakame\Intl;
 
-use Bakame\Intl\Option\AttributeFormat;
 use Bakame\Intl\Option\CalendarFormat;
 use Bakame\Intl\Option\DateFormat;
-use Bakame\Intl\Option\PaddingPosition;
-use Bakame\Intl\Option\RoundingMode;
 use Bakame\Intl\Option\StyleFormat;
 use Bakame\Intl\Option\TimeFormat;
 use Bakame\Intl\Option\TypeFormat;
@@ -24,18 +21,11 @@ use Symfony\Component\Intl\Timezones;
 
 final class Formatter
 {
-    private DateFactory $dateFactory;
-    private NumberFactory $numberFactory;
-    private DateResolver $dateResolver;
-
     public function __construct(
-        DateFactory $dateFactory,
-        NumberFactory $numberFactory,
-        DateResolver $dateResolver
+        private DateFactory $dateFactory,
+        private NumberFactory $numberFactory,
+        private DateResolver $dateResolver
     ) {
-        $this->dateFactory = $dateFactory;
-        $this->numberFactory = $numberFactory;
-        $this->dateResolver = $dateResolver;
     }
 
     public function getCountryName(?string $country, string $locale = null): string
@@ -46,7 +36,7 @@ final class Formatter
 
         try {
             return Countries::getName($country, $locale);
-        } catch (MissingResourceException $exception) {
+        } catch (MissingResourceException) {
             return $country;
         }
     }
@@ -59,7 +49,7 @@ final class Formatter
 
         try {
             return Currencies::getName($currency, $locale);
-        } catch (MissingResourceException $exception) {
+        } catch (MissingResourceException) {
             return $currency;
         }
     }
@@ -72,7 +62,7 @@ final class Formatter
 
         try {
             return Currencies::getSymbol($currency, $locale);
-        } catch (MissingResourceException $exception) {
+        } catch (MissingResourceException) {
             return $currency;
         }
     }
@@ -85,7 +75,7 @@ final class Formatter
 
         try {
             return Languages::getName($language, $locale);
-        } catch (MissingResourceException $exception) {
+        } catch (MissingResourceException) {
             return $language;
         }
     }
@@ -98,7 +88,7 @@ final class Formatter
 
         try {
             return Locales::getName($data, $locale);
-        } catch (MissingResourceException $exception) {
+        } catch (MissingResourceException) {
             return $data;
         }
     }
@@ -111,7 +101,7 @@ final class Formatter
 
         try {
             return Timezones::getName($timezone, $locale);
-        } catch (MissingResourceException $exception) {
+        } catch (MissingResourceException) {
             return $timezone;
         }
     }
@@ -123,18 +113,17 @@ final class Formatter
     {
         try {
             return Timezones::forCountryCode($country);
-        } catch (MissingResourceException $exception) {
+        } catch (MissingResourceException) {
             return [];
         }
     }
 
     /**
-     * @param int|float $amount
-     * @param array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>> $attrs
+     * @param array<string, int|float|string> $attrs
      */
-    public function formatCurrency($amount, string $currency, ?string $locale = null, array $attrs = []): string
+    public function formatCurrency(int|float $amount, string $currency, ?string $locale = null, array $attrs = []): string
     {
-        $formatter = $this->numberFactory->createNumberFormatter($locale, 'currency', $attrs);
+        $formatter = $this->numberFactory->createNumberFormatter($locale, StyleFormat::Currency(), $attrs);
         if (false === $ret = $formatter->formatCurrency($amount, $currency)) {
             // @codeCoverageIgnoreStart
             throw FailedFormatting::dueToNumberFormatter('Unable to format the given number as a currency.');
@@ -145,20 +134,23 @@ final class Formatter
     }
 
     /**
-     * @param key-of<TypeFormat::INTL_MAPPER> $type
-     * @param int|float $number
-     * @param array<key-of<AttributeFormat::INTL_MAPPER>, int|float|key-of<RoundingMode::INTL_MAPPER>|key-of<PaddingPosition::INTL_MAPPER>> $attrs
-     * @param key-of<StyleFormat::INTL_MAPPER>|null $style
+     * @param Option\TypeFormat|key-of<Option\TypeFormat::INTL_MAPPER> $type
+     * @param array<string, int|float|string> $attrs
+     * @param Option\StyleFormat|key-of<Option\StyleFormat::INTL_MAPPER>|null $style
      */
     public function formatNumber(
-        $number,
+        int|float $number,
         ?string $locale = null,
-        string $type = 'default',
+        TypeFormat|string $type = 'default',
         array $attrs = [],
-        ?string $style = null
+        StyleFormat|string|null $style = null
     ): string {
         $formatter = $this->numberFactory->createNumberFormatter($locale, $style, $attrs);
-        if (false === $ret = $formatter->format($number, Option\TypeFormat::from($type)->toIntlConstant())) {
+        if (!$type instanceof TypeFormat) {
+            $type = TypeFormat::from($type);
+        }
+
+        if (false === $ret = $formatter->format($number, $type->toIntlConstant())) {
             // @codeCoverageIgnoreStart
             throw FailedFormatting::dueToNumberFormatter('Unable to format the given number.');
             // @codeCoverageIgnoreEnd
@@ -168,22 +160,20 @@ final class Formatter
     }
 
     /**
-     * @param DateTimeInterface|string|int|null $date A date or null to use the current time
-     * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     * @param key-of<DateFormat::INTL_MAPPER>|null $dateFormat
-     * @param key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
-     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
+     * @param DateFormat|key-of<DateFormat::INTL_MAPPER>|null $dateFormat
+     * @param TimeFormat|key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
+     * @param CalendarFormat|key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      *
      * @throws FailedFormatting
      */
     public function formatDateTime(
-        $date,
+        DateTimeInterface|string|int|null $date,
         ?string $locale = null,
-        $timezone = null,
-        ?string $dateFormat = null,
-        ?string $timeFormat = null,
+        DateTimeZone|string|false|null $timezone = null,
+        DateFormat|string|null $dateFormat = null,
+        TimeFormat|string|null $timeFormat = null,
         ?string $pattern = null,
-        ?string $calendar = null
+        CalendarFormat|string|null $calendar = null
     ): string {
         try {
             $date = $this->dateResolver->resolve($date, $timezone);
@@ -202,36 +192,32 @@ final class Formatter
     }
 
     /**
-     * @param DateTimeInterface|string|int|null $date A date or null to use the current time
-     * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     * @param key-of<DateFormat::INTL_MAPPER>|null $dateFormat
-     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
+     * @param DateFormat|key-of<DateFormat::INTL_MAPPER>|null $dateFormat
+     * @param CalendarFormat|key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      */
     public function formatDate(
-        $date,
+        DateTimeInterface|string|int|null $date,
         ?string $locale = null,
-        $timezone = null,
-        ?string $dateFormat = null,
+        DateTimeZone|string|false|null $timezone = null,
+        DateFormat|string|null $dateFormat = null,
         ?string $pattern = null,
-        ?string $calendar = null
+        CalendarFormat|string|null $calendar = null
     ): string {
-        return $this->formatDateTime($date, $locale, $timezone, $dateFormat, 'none', $pattern, $calendar);
+        return $this->formatDateTime($date, $locale, $timezone, $dateFormat, TimeFormat::None(), $pattern, $calendar);
     }
 
     /**
-     * @param DateTimeInterface|string|int|null $date A date or null to use the current time
-     * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     * @param key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
-     * @param key-of<CalendarFormat::INTL_MAPPER>|null $calendar
+     * @param TimeFormat|key-of<TimeFormat::INTL_MAPPER>|null $timeFormat
+     * @param CalendarFormat|key-of<CalendarFormat::INTL_MAPPER>|null $calendar
      */
     public function formatTime(
-        $date,
+        DateTimeInterface|string|int|null $date,
         ?string $locale = null,
-        $timezone = null,
-        ?string $timeFormat = null,
+        DateTimeZone|string|false|null $timezone = null,
+        TimeFormat|string|null $timeFormat = null,
         ?string $pattern = null,
-        ?string $calendar = null
+        CalendarFormat|string|null $calendar = null
     ): string {
-        return $this->formatDateTime($date, $locale, $timezone, 'none', $timeFormat, $pattern, $calendar);
+        return $this->formatDateTime($date, $locale, $timezone, DateFormat::None(), $timeFormat, $pattern, $calendar);
     }
 }

@@ -9,49 +9,31 @@ use NumberFormatter;
 
 final class AttributeOption
 {
-    /**
-     * @readonly
-     *
-     * @var int|float
-     */
-    public $value;
-
-    /** @readonly */
-    public AttributeFormat $name;
-
-    /**
-     * @param int|float $value
-     */
-    private function __construct(AttributeFormat $name, $value)
-    {
-        $this->value = $value;
-        $this->name = $name;
+    private function __construct(
+        /** @readonly */
+        public AttributeFormat $name,
+        /** @readonly */
+        public int|float|RoundingMode|PaddingPosition $value
+    ) {
     }
 
-    /**
-     * @param int|float|string $value
-     */
-    public static function from(string $name, $value): self
+    public static function from(string $name, int|float|string $value): self
     {
         $attributeName = AttributeFormat::from($name);
 
-        if (NumberFormatter::ROUNDING_MODE === $attributeName->toIntlConstant() && is_string($value)) {
-            return new self($attributeName, RoundingMode::from($value)->toIntlConstant());
-        }
-
-        if (NumberFormatter::PADDING_POSITION === $attributeName->toIntlConstant() && is_string($value)) {
-            return new self($attributeName, PaddingPosition::from($value)->toIntlConstant());
-        }
-
-        if (is_string($value)) {
-            throw FailedFormatting::dueToInvalidNumberFormatterAttributeValue($name, $value);
-        }
-
-        return new self($attributeName, $value);
+        return match (true) {
+            !is_string($value) => new self($attributeName, $value),
+            AttributeFormat::RoundingMode() === $attributeName => new self($attributeName, RoundingMode::from($value)),
+            AttributeFormat::PaddingPosition() === $attributeName => new self($attributeName, PaddingPosition::from($value)),
+            default => throw FailedFormatting::dueToInvalidNumberFormatterAttributeValue($name, $value),
+        };
     }
 
     public function addTo(NumberFormatter $numberFormatter): void
     {
-        $numberFormatter->setAttribute($this->name->toIntlConstant(), $this->value);
+        $numberFormatter->setAttribute($this->name->toIntlConstant(), match (true) {
+            is_object($this->value) => $this->value->toIntlConstant(),
+            default => $this->value,
+        });
     }
 }

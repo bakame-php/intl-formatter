@@ -9,14 +9,13 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Exception;
+use Stringable;
 
 final class DateResolver
 {
-    private DateTimeZone $timezone;
-
-    private function __construct(DateTimeZone $timezone)
-    {
-        $this->timezone = $timezone;
+    private function __construct(
+        private DateTimeZone $timezone
+    ) {
     }
 
     public static function fromSystem(): self
@@ -26,7 +25,7 @@ final class DateResolver
 
     public static function fromTimeZoneIdentifier(string $identifier): self
     {
-        return new self(new DateTimeZone($identifier));
+        return self::fromTimeZone(new DateTimeZone($identifier));
     }
 
     public static function fromTimeZone(DateTimeZone $timezone): self
@@ -35,14 +34,19 @@ final class DateResolver
     }
 
     /**
-     * @param DateTimeInterface|string|int|null $date A date or null to use the current time
-     * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     *
      * @throws Exception
      */
-    public function resolve($date, $timezone): DateTimeInterface
-    {
-        $timezone = $this->determineTheTimezone($timezone);
+    public function resolve(
+        DateTimeInterface|Stringable|string|int|null $date,
+        DateTimeZone|string|false|null $timezone
+    ): DateTimeInterface {
+        $timezone = match (true) {
+            null === $timezone => $this->timezone,
+            false === $timezone => null,
+            $timezone instanceof DateTimeZone => $timezone,
+            default => new DateTimeZone($timezone),
+        };
+
         if ($date instanceof DateTimeImmutable) {
             return null !== $timezone ? $date->setTimezone($timezone) : $date;
         }
@@ -65,25 +69,5 @@ final class DateResolver
         }
 
         return new DateTimeImmutable($asString, $timezone);
-    }
-
-    /**
-     * @param DateTimeZone|string|false|null $timezone The target timezone, null to use the default, false to leave unchanged
-     */
-    private function determineTheTimezone($timezone): ?DateTimeZone
-    {
-        if (null === $timezone) {
-            return $this->timezone;
-        }
-
-        if (false === $timezone) {
-            return null;
-        }
-
-        if ($timezone instanceof DateTimeZone) {
-            return $timezone;
-        }
-
-        return new DateTimeZone($timezone);
     }
 }

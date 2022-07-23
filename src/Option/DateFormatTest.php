@@ -6,6 +6,7 @@ namespace Bakame\Intl\Option;
 
 use Bakame\Intl\FailedFormatting;
 use IntlDateFormatter;
+use LogicException;
 use PHPUnit\Framework\TestCase;
 
 final class DateFormatTest extends TestCase
@@ -46,5 +47,29 @@ final class DateFormatTest extends TestCase
     public function it_returns_null_with_invalid_constant_value_using_tryfrom(): void
     {
         self::assertNull(DateFormat::tryFrom('foobar'));
+    }
+
+    /** @test */
+    public function it_throws_if_you_want_to_clone_it(): void
+    {
+        $this->expectException(LogicException::class);
+
+        clone DateFormat::Full();
+    }
+
+    /** @test */
+    public function it_throws_if_you_want_to_serialize_it(): void
+    {
+        $this->expectException(LogicException::class);
+
+        serialize(DateFormat::Full());
+    }
+
+    /** @test */
+    public function it_throws_if_you_want_to_unserialize_it(): void
+    {
+        $this->expectException(LogicException::class);
+
+        DateFormat::Full()->__wakeup();
     }
 }
